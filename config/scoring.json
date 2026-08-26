@@ -1,0 +1,36 @@
+{
+  "hintPointsMax": 5,
+  "stationTaskDefault": 5,
+  "stationTaskPoints": {
+    "1": 5,
+    "2": 5,
+    "3": 5
+  },
+  "questionDefault": 1,
+  "questionPoints": {
+    "picture-round": 8,
+    "geo-neighbours": 1,
+    "geo-flags": 1,
+    "history-1": 1,
+    "history-2": 1,
+    "politics-1": 1,
+    "ancient-1": 1,
+    "politics-2": 1,
+    "sport-1": 1,
+    "nature-lizard": 1,
+    "bonus-alcohol": 1,
+    "literature-1": 1,
+    "art-1": 1,
+    "games-1": 1,
+    "science-1": 1,
+    "series-1": 1,
+    "film-1": 1,
+    "music-1": 1,
+    "music-2": 1,
+    "lyrics-1": 1,
+    "played-song": 1
+  },
+  "guinnessPerLogo": 1,
+  "architecturePerStyle": 1,
+  "beerPerUniqueCan": 1
+}

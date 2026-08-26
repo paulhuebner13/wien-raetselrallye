@@ -1,0 +1,59 @@
+{
+  "intro": {
+    "title": "Wien Rätselrallye",
+    "body": [
+      "Sucht die Orte mit den Hinweisen und findet dort die Antworten.",
+      "Die Hinweise zeigen den gesuchten Bereich, nicht zwingend den exakten Aufnahmeort.",
+      "Bis zum Ablauf des Timers müsst ihr im Johnny's Pub sein. Danach sind keine Änderungen mehr möglich."
+    ],
+    "phoneRules": [
+      "Handys nur für diese Website, Antworten und Fotos.",
+      "Kein Google, keine KI, keine anderen Webseiten oder Apps.",
+      "Keine digitale Navigation. Nur der mitgegebene Stadtplan ist erlaubt."
+    ]
+  },
+  "stationCount": 3,
+  "finalStationId": 3,
+  "architectureStyles": [
+    {"name":"Gotik","description":"Spitzbögen, hohe schmale Fenster, starke Vertikale."},
+    {"name":"Barock","description":"Geschwungene Formen, Kuppeln, viel Dekor."},
+    {"name":"Jugendstil","description":"Florale oder geometrische Ornamente, dekorative Fassaden."},
+    {"name":"Klassizismus","description":"Symmetrie, Säulen, Dreiecksgiebel, antike Formen."},
+    {"name":"Historismus","description":"Prunkvolle Fassaden des 19. Jh.; ältere Stile werden neu aufgegriffen oder gemischt."}
+  ],
+  "stations": [
+    {
+      "id": 1,
+      "title": "Station 1",
+      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "answerLabel": "Lösung",
+      "taskPoints": 5,
+      "images": [
+        "/stations/1/1_1.svg", "/stations/1/1_2.svg", "/stations/1/1_3.svg",
+        "/stations/1/1_4.svg", "/stations/1/1_5.svg", "/stations/1/1_6.svg"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Station 2",
+      "text": "Findet vor Ort das gesuchte Schild und tragt die Antwort ein.",
+      "answerLabel": "Antwort",
+      "taskPoints": 5,
+      "images": [
+        "/stations/2/2_1.svg", "/stations/2/2_2.svg", "/stations/2/2_3.svg",
+        "/stations/2/2_4.svg", "/stations/2/2_5.svg", "/stations/2/2_6.svg"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Johnny's Pub",
+      "text": "Letzte Station: Findet den Ort und löst die Aufgabe. Bis zum Timer-Ende müsst ihr hier sein.",
+      "answerLabel": "Antwort",
+      "taskPoints": 5,
+      "images": [
+        "/stations/3/3_1.svg", "/stations/3/3_2.svg", "/stations/3/3_3.svg",
+        "/stations/3/3_4.svg", "/stations/3/3_5.svg", "/stations/3/3_6.svg"
+      ]
+    }
+  ]
+}

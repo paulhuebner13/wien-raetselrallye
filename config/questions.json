@@ -1,0 +1,67 @@
+{
+  "blocks": [
+    {
+      "id": "block-1",
+      "categories": ["Picture Round", "Geographie"],
+      "questions": [
+        {"id":"picture-round","category":"Picture Round","text":"Welche 8 Länder sind abgebildet? Schreibt die Ländernamen in der Reihenfolge 1–8.","type":"picture_round"},
+        {"id":"geo-neighbours","category":"Geographie","text":"Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."},
+        {"id":"geo-flags","category":"Geographie","text":"Welche Farbe kommt als einzige in den Flaggen von Brasilien, Sudan, Litauen und Aserbaidschan vor? Schwarz und Weiß zählen als Farben."}
+      ]
+    },
+    {
+      "id": "block-2",
+      "categories": ["Geschichte", "Politik", "Geschichte / Antike"],
+      "questions": [
+        {"id":"history-1","category":"Geschichte","text":"Geschichtsfrage 1 – hier ersetzen."},
+        {"id":"history-2","category":"Geschichte","text":"Geschichtsfrage 2 – hier ersetzen."},
+        {"id":"politics-1","category":"Politik","text":"Politikfrage 1 – hier ersetzen."},
+        {"id":"ancient-1","category":"Geschichte / Antike","text":"Antike-Frage – hier ersetzen."}
+      ]
+    },
+    {
+      "id": "block-3",
+      "categories": ["Politik", "Sport", "Natur / Allgemeinwissen"],
+      "questions": [
+        {"id":"politics-2","category":"Politik","text":"Politikfrage 2 – hier ersetzen."},
+        {"id":"sport-1","category":"Sport","text":"Sportfrage – hier ersetzen."},
+        {"id":"nature-lizard","category":"Natur / Allgemeinwissen","text":"Welche ist die größte noch lebende Echse?"}
+      ]
+    },
+    {
+      "id": "bonus",
+      "categories": ["Bonus / Schätzfrage"],
+      "questions": [
+        {"id":"bonus-alcohol","category":"Bonus / Schätzfrage","text":"Wie viele Liter reinen Alkohol werden in Österreich durchschnittlich pro Person ab 15 Jahren und Jahr konsumiert?"}
+      ]
+    },
+    {
+      "id": "block-4",
+      "categories": ["Literatur", "Kunst", "Computer / Games"],
+      "questions": [
+        {"id":"literature-1","category":"Literatur","text":"Literaturfrage – hier ersetzen."},
+        {"id":"art-1","category":"Kunst","text":"Kunstfrage – hier ersetzen."},
+        {"id":"games-1","category":"Computer / Games","text":"Games-Frage – hier ersetzen."}
+      ]
+    },
+    {
+      "id": "block-5",
+      "categories": ["Computer / Wissenschaft", "Serien / Film", "Film"],
+      "questions": [
+        {"id":"science-1","category":"Computer / Wissenschaft","text":"Computer-/Wissenschaftsfrage – hier ersetzen."},
+        {"id":"series-1","category":"Serien / Film","text":"Serien-/Filmfrage – hier ersetzen."},
+        {"id":"film-1","category":"Film","text":"Filmfrage – hier ersetzen."}
+      ]
+    },
+    {
+      "id": "block-6",
+      "categories": ["Song / Musik", "Lyrics", "Song vorgespielt"],
+      "questions": [
+        {"id":"music-1","category":"Song / Musik","text":"Musikfrage 1 – hier ersetzen."},
+        {"id":"music-2","category":"Song / Musik","text":"Musikfrage 2 – hier ersetzen."},
+        {"id":"lyrics-1","category":"Lyrics","text":"Lyrics-Frage – hier ersetzen."},
+        {"id":"played-song","category":"Song vorgespielt","text":"Welcher Song wird vorgespielt?"}
+      ]
+    }
+  ]
+}
