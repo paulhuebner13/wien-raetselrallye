@@ -7,17 +7,17 @@
         {
           "id": "picture-round",
           "category": "Picture Round",
-          "text": "Welche 8 Länder sind abgebildet?",
+          "text": "Zu welchen berühmten Personen gehören die folgenden Geburtsorte (grün) und Sterbeorte (rot)?",
           "type": "picture_round",
           "images": [
-            "/picture-round/1.jpg",
-            "/picture-round/2.jpg",
-            "/picture-round/3.jpg",
-            "/picture-round/4.jpg",
-            "/picture-round/5.jpg",
-            "/picture-round/6.jpg",
-            "/picture-round/7.jpg",
-            "/picture-round/8.jpg"
+            "/picture-round/1.png",
+            "/picture-round/2.png",
+            "/picture-round/3.png",
+            "/picture-round/4.png",
+            "/picture-round/5.png",
+            "/picture-round/6.png",
+            "/picture-round/7.png",
+            "/picture-round/8.png"
           ]
         },
         {"id":"geo-neighbours","category":"Geographie","text":"Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."},
