@@ -34,6 +34,7 @@ export default function LoginForm() {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) return setError(data.error ?? 'Login fehlgeschlagen.');
+    sessionStorage.setItem('rallye-show-intro', '1');
     router.push('/rallye');
     router.refresh();
   }

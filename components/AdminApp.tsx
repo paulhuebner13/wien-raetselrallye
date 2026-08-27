@@ -13,6 +13,7 @@ type Overview = {
   guinness: Array<{ id: string; team_id: string; street: string; image_url?: string | null }>;
   architecture: Array<{ id: string; team_id: string; style: string; building_name: string; image_url?: string | null }>;
   pictureRoundImages: Array<{ slot: number; image_url: string | null }>;
+  evaluations: Array<{ team_id: string; item_type: 'question' | 'station' | 'guinness' | 'architecture' | 'beer'; item_id: string; is_valid: boolean }>;
   deadlineAt: string | null;
 };
 
@@ -131,10 +132,6 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     if (!confirm('Stationsantwort zurücksetzen?')) return;
     await fetch('/api/admin/reset-station', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, stationId }) }); await load();
   }
-  async function scoreStation(teamId: string, stationId: number, value: string) {
-    const res = await fetch('/api/admin/score-station', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, stationId, scorePercent: value }) });
-    if (!res.ok) setError((await res.json()).error ?? 'Fehler.'); else await load();
-  }
   async function saveDeadline() {
     const deadlineAt = deadlineLocal ? new Date(deadlineLocal).toISOString() : null;
     const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deadlineAt }) });
@@ -144,6 +141,31 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     const stationOrder = (orderInputs[teamId] ?? '').split(',').map((x) => Number(x.trim())).filter(Number.isFinite);
     const res = await fetch('/api/admin/team-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, stationOrder }) });
     const data = await res.json(); if (!res.ok) return setError(data.error ?? 'Fehler.'); await load();
+  }
+
+  async function setEvaluation(teamId: string, itemType: 'question' | 'station' | 'guinness' | 'architecture' | 'beer', itemId: string, isValid: boolean) {
+    const res = await fetch('/api/admin/evaluation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, itemType, itemId, isValid }) });
+    if (!res.ok) return setError((await res.json()).error ?? 'Fehler.');
+    setOverview((current) => current ? { ...current, evaluations: [
+      ...current.evaluations.filter((e) => !(e.team_id === teamId && e.item_type === itemType && e.item_id === itemId)),
+      { team_id: teamId, item_type: itemType, item_id: itemId, is_valid: isValid },
+    ] } : current);
+  }
+
+  function evaluationIsValid(teamId: string, itemType: 'question' | 'station' | 'guinness' | 'architecture' | 'beer', itemId: string) {
+    return overview?.evaluations.some((e) => e.team_id === teamId && e.item_type === itemType && e.item_id === itemId && e.is_valid) ?? false;
+  }
+
+  function teamScore(teamId: string) {
+    if (!overview) return { total: 0, hints: 0, stations: 0, quiz: 0, guinness: 0, architecture: 0, beer: 0 };
+    const progress = overview.progress.filter((p) => p.team_id === teamId);
+    const hints = progress.reduce((sum, p) => sum + (p.submitted_at ? Math.max(0, scoringConfig.hintPointsMax - (p.hints_used ?? 0)) : 0), 0);
+    const stations = rallyeConfig.stations.reduce((sum, station) => sum + (evaluationIsValid(teamId, 'station', String(station.id)) ? stationTaskPoints(station.id) : 0), 0);
+    const quiz = questionBlocks.flatMap((b) => b.questions).reduce((sum, q) => sum + (evaluationIsValid(teamId, 'question', q.id) ? questionPoints(q.id) : 0), 0);
+    const guinness = overview.guinness.filter((g) => g.team_id === teamId && evaluationIsValid(teamId, 'guinness', g.id)).length * scoringConfig.guinnessPerLogo;
+    const architecture = overview.architecture.filter((a) => a.team_id === teamId && evaluationIsValid(teamId, 'architecture', a.id)).length * scoringConfig.architecturePerStyle;
+    const beer = overview.beers.filter((b) => b.team_id === teamId && evaluationIsValid(teamId, 'beer', b.id)).length * scoringConfig.beerPerUniqueCan;
+    return { total: hints + stations + quiz + guinness + architecture + beer, hints, stations, quiz, guinness, architecture, beer };
   }
 
   async function uploadPicture(slot: number, file: File) {
@@ -214,6 +236,14 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
 
     <section className="admin-panel"><h2>Punkte</h2><p className="muted">Bearbeiten in <code>config/scoring.json</code>.</p><div className="score-summary"><span>Standardfrage: <b>{scoringConfig.questionDefault}</b></span><span>Guinness: <b>{scoringConfig.guinnessPerLogo}/Logo</b></span><span>Architektur: <b>{scoringConfig.architecturePerStyle}/Stil</b></span><span>Wegbier: <b>{scoringConfig.beerPerUniqueCan}/Bier</b></span></div></section>
 
+    <section className="admin-panel">
+      <h2>Auswertung</h2>
+      <div className="results-grid">{[...overview.teams].sort((a, b) => teamScore(b.id).total - teamScore(a.id).total).map((team) => {
+        const score = teamScore(team.id);
+        return <article className="result-card" key={team.id}><div><span className="eyebrow">{team.name}</span><strong>{score.total} P.</strong></div><p>Hinweise {score.hints} · Stationen {score.stations} · Quiz {score.quiz} · Guinness {score.guinness} · Architektur {score.architecture} · Wegbier {score.beer}</p></article>;
+      })}</div>
+    </section>
+
     {overview.teams.map((team) => {
       const progress = overview.progress.filter((p) => p.team_id === team.id);
       const answers = Object.fromEntries(overview.quiz.filter((q) => q.team_id === team.id).map((q) => [q.question_id, q.answer]));
@@ -225,18 +255,18 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
         <h3>Stationen</h3>
         <div className="admin-grid">{rallyeConfig.stations.map((station) => {
           const p = progress.find((x) => x.station_id === station.id);
-          return <article className="admin-card" key={station.id}><b>{station.title}</b><p className="admin-answer">{p?.answer || '—'}</p><small>Hinweise: {p?.hints_used ?? 0} · Punkte: {Math.max(0, 5 - (p?.hints_used ?? 0))}/5</small><label className="score-label">Vor-Ort % (max {stationTaskPoints(station.id)} P.)<input type="number" min="0" max="100" defaultValue={p?.score_percent ?? ''} onBlur={(e) => scoreStation(team.id, station.id, e.target.value)} /></label><button className="secondary" onClick={() => resetStation(team.id, station.id)} disabled={!p?.submitted_at}>Antwort zurücksetzen</button></article>;
+          return <article className="admin-card" key={station.id}><b>{station.title}</b><p className="admin-answer">{p?.answer || '—'}</p><small>Hinweise: {p?.hints_used ?? 0} · Hinweispunkte: {p?.submitted_at ? Math.max(0, scoringConfig.hintPointsMax - (p?.hints_used ?? 0)) : 0}/{scoringConfig.hintPointsMax}</small><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'station', String(station.id))} onChange={(e) => setEvaluation(team.id, 'station', String(station.id), e.target.checked)} /> Vor-Ort-Antwort richtig (+{stationTaskPoints(station.id)} P.)</label><button className="secondary" onClick={() => resetStation(team.id, station.id)} disabled={!p?.submitted_at}>Antwort zurücksetzen</button></article>;
         })}</div>
 
         <h3>Quiz</h3>
-        {questionBlocks.map((block) => <div key={block.id} className="admin-question-block"><b>{blockLabel(block)}</b><div className="admin-list">{block.questions.map((q) => <div key={q.id} className="admin-answer-row"><span><b>{q.category} · {questionPoints(q.id)} P.</b><br />{q.text}</span><strong>{answers[q.id] || '—'}</strong></div>)}</div></div>)}
+        {questionBlocks.map((block) => <div key={block.id} className="admin-question-block"><b>{blockLabel(block)}</b><div className="admin-list">{block.questions.map((q) => <div key={q.id} className="admin-answer-row"><span><b>{q.category} · {questionPoints(q.id)} P.</b><br />{q.text}</span><div className="evaluation-answer"><strong>{answers[q.id] || '—'}</strong><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'question', q.id)} onChange={(e) => setEvaluation(team.id, 'question', q.id, e.target.checked)} /> Richtig</label></div></div>)}</div></div>)}
 
-        <h3>Guinness ({guinness.length * scoringConfig.guinnessPerLogo} Punkte)</h3>
-        <div className="admin-photo-grid">{guinness.map((g) => <div className="admin-photo" key={g.id}>{g.image_url && <img src={g.image_url} alt="Guinness" />}<b>{g.street}</b></div>)}</div>
-        <h3>Architektur ({architecture.length * scoringConfig.architecturePerStyle} Punkte)</h3>
-        <div className="admin-photo-grid">{architecture.map((a) => <div className="admin-photo" key={a.id}>{a.image_url && <img src={a.image_url} alt={a.style} />}<b>{a.style}</b><span>{a.building_name}</span></div>)}</div>
-        <h3>Wegbier ({beers.length * scoringConfig.beerPerUniqueCan} Punkte)</h3>
-        <div className="admin-photo-grid">{beers.map((b) => <div className="admin-photo" key={b.id}>{b.image_url && <img src={b.image_url} alt={b.brand} />}<b>{b.brand}</b></div>)}</div>
+        <h3>Guinness</h3>
+        <div className="admin-photo-grid">{guinness.map((g) => <div className="admin-photo" key={g.id}>{g.image_url && <img src={g.image_url} alt="Guinness" />}<b>{g.street}</b><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'guinness', g.id)} onChange={(e) => setEvaluation(team.id, 'guinness', g.id, e.target.checked)} /> Gültig (+{scoringConfig.guinnessPerLogo} P.)</label></div>)}</div>
+        <h3>Architektur</h3>
+        <div className="admin-photo-grid">{architecture.map((a) => <div className="admin-photo" key={a.id}>{a.image_url && <img src={a.image_url} alt={a.style} />}<b>{a.style}</b><span>{a.building_name}</span><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'architecture', a.id)} onChange={(e) => setEvaluation(team.id, 'architecture', a.id, e.target.checked)} /> Gültig (+{scoringConfig.architecturePerStyle} P.)</label></div>)}</div>
+        <h3>Wegbier</h3>
+        <div className="admin-photo-grid">{beers.map((b) => <div className="admin-photo" key={b.id}>{b.image_url && <img src={b.image_url} alt={b.brand} />}<b>{b.brand}</b><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'beer', b.id)} onChange={(e) => setEvaluation(team.id, 'beer', b.id, e.target.checked)} /> Gültig (+{scoringConfig.beerPerUniqueCan} P.)</label></div>)}</div>
       </section>;
     })}
   </main>;

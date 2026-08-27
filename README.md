@@ -15,3 +15,12 @@ Enthalten:
 - separates Punktesystem in `config/scoring.json`
 
 Einrichtung: siehe `SETUP.md`.
+
+
+## Aktuelle Version
+
+- Guinness-Farbschema
+- Johnny's Pub als letzte Station nach der Fragenkontrolle
+- Regeln-Popup nur direkt nach Login; Info-Button öffnet es erneut
+- Admin-Auswertung mit manueller Gültigkeitsprüfung und Gesamtpunkten
+- Foto-Buttons der Team-Challenges öffnen auf Mobilgeräten die Kamera (`capture=environment`)

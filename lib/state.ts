@@ -65,6 +65,6 @@ export async function getTeamState(teamId: string) {
     deadlineAt,
     locked,
     finalStationTitle: rallyeConfig.stations.find((s) => s.id === rallyeConfig.finalStationId)?.title ?? "Johnny's Pub",
-    reviewUnlocked: stationStates.every((s) => s.submitted),
+    reviewUnlocked: stationStates.filter((s) => s.stationId !== rallyeConfig.finalStationId).every((s) => s.submitted),
   };
 }

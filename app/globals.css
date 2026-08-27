@@ -166,3 +166,54 @@ h3 { margin: 22px 0 9px; }
 .app-header { top: 42px; margin-top: 42px; }
 .full-sheet { padding-top: 42px; }
 @media (max-width: 700px) { .deadline-bar { top: 0; } .app-header { top: 42px; } }
+
+/* Guinness-inspiriertes Farbschema */
+:root {
+  --bg: #f1e7d7;
+  --card: #fffaf1;
+  --text: #17120e;
+  --muted: #74675a;
+  --line: #d5c2ad;
+  --brown: #6f4328;
+  --brown-dark: #3f281b;
+  --brown-soft: #ead8c5;
+  --cream: #f8f0e3;
+  --yellow: #b78b4c;
+  --yellow-soft: #f1dfbf;
+  --green: #416247;
+  --green-soft: #e0e8dc;
+  --gray: #ded4c7;
+  --danger: #963d33;
+}
+html, body { background: var(--bg); }
+.app-header { background: rgba(241,231,215,.96); }
+.bottom-nav { background: #fffaf1; }
+.primary { background: #17120e; color: #fffaf1; }
+.secondary { background: var(--brown-soft); color: var(--brown-dark); }
+.icon-button { background: var(--card); border-color: var(--line); }
+.file-button { background: var(--cream); border-color: #a98260; }
+.rule-box, .upload-form, .photo-entry, .style-card, .question-card, .admin-panel, .login-card { background: var(--card); }
+.count-badge { background: var(--brown-dark); border-color: var(--brown-dark); color: #fffaf1; }
+.bottom-nav button.active { color: var(--brown-dark); }
+.deadline-bar { background: #ead6b7; border-color: #b89063; color: var(--brown-dark); }
+.deadline-bar.expired { background: #ead7d2; border-color: #bd8980; color: #732c25; }
+.path-node.open { background: var(--yellow-soft); border-color: #9d713a; color: var(--brown-dark); }
+.path-node.locked { background: var(--gray) !important; color: #8a7e72; }
+.path-row::before, .path-row::after { border-color: #9b806a; }
+.points-pill { background: var(--yellow-soft); border-color: #aa7d42; color: var(--brown-dark); }
+
+/* Regeln müssen immer über Header und Timer liegen */
+.modal-backdrop { z-index: 120; }
+.modal { background: var(--card); }
+
+.tab-score-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.path-placeholder { min-height: 1px; }
+
+.evaluation-check { display: flex; grid-template-columns: none; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: var(--brown-dark); }
+.evaluation-check input { width: 20px; height: 20px; margin: 0; accent-color: var(--brown); }
+.evaluation-answer { display: grid; gap: 10px; align-content: start; }
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.result-card { border: 1px solid var(--line); background: var(--cream); border-radius: 16px; padding: 14px; }
+.result-card > div { display: flex; justify-content: space-between; gap: 12px; align-items: end; }
+.result-card strong { font-size: 27px; color: var(--brown-dark); }
+.result-card p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }

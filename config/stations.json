@@ -1,13 +1,14 @@
 {
   "intro": {
-    "title": "Wien Rätselrallye",
+    "title": "Rätselrallye",
     "body": [
-      "Sucht die Orte mit den Hinweisen und findet dort die Antworten.",
-      "Die Hinweise zeigen den gesuchten Bereich, nicht zwingend den exakten Aufnahmeort.",
+      "Sucht die Orte mittels der Hinweise und findet dort die Antworten auf die Fragen.",
+      "Die Hinweise zeigen den gesuchten Bereich. Gemeint ist nicht nur der exakte Aufnahmeort, sondern der größere, klar abgegrenzte Bereich.",
       "Bis zum Ablauf des Timers müsst ihr im Johnny's Pub sein. Danach sind keine Änderungen mehr möglich."
     ],
     "phoneRules": [
       "Handys nur für diese Website, Antworten und Fotos.",
+      "Fotos direkt in der App machen.",
       "Kein Google, keine KI, keine anderen Webseiten oder Apps.",
       "Keine digitale Navigation. Nur der mitgegebene Stadtplan ist erlaubt."
     ]
@@ -15,11 +16,26 @@
   "stationCount": 3,
   "finalStationId": 3,
   "architectureStyles": [
-    {"name":"Gotik","description":"Spitzbögen, hohe schmale Fenster, starke Vertikale."},
-    {"name":"Barock","description":"Geschwungene Formen, Kuppeln, viel Dekor."},
-    {"name":"Jugendstil","description":"Florale oder geometrische Ornamente, dekorative Fassaden."},
-    {"name":"Klassizismus","description":"Symmetrie, Säulen, Dreiecksgiebel, antike Formen."},
-    {"name":"Historismus","description":"Prunkvolle Fassaden des 19. Jh.; ältere Stile werden neu aufgegriffen oder gemischt."}
+    {
+      "name": "Gotik",
+      "description": "Typisch sind Spitzbögen, Kreuzrippengewölbe und Strebewerk. Große Fensterflächen und hohe, stark vertikale Proportionen lassen die Gebäude aufwärtsstrebend wirken."
+    },
+    {
+      "name": "Barock",
+      "description": "Barocke Fassaden wirken repräsentativ und sind oft reich geschmückt. Häufig sind Säulen oder Pilaster, Giebel, Kuppeln und bewegte, geschwungene Formen; die Mitte der Fassade wird oft besonders betont."
+    },
+    {
+      "name": "Jugendstil",
+      "description": "Typisch sind dekorativ geschwungene Linien und florale Ornamente; in Wien treten oft auch geometrische und reduzierte Formen auf. Der Jugendstil wollte sich bewusst von der Nachahmung älterer historischer Stile lösen."
+    },
+    {
+      "name": "Klassizismus",
+      "description": "Der Klassizismus orientiert sich an der griechischen und römischen Antike, besonders am Tempelbau. Typisch sind klare Symmetrie, Säulen, Dreiecksgiebel und eher geradlinige, ruhige Formen."
+    },
+    {
+      "name": "Historismus",
+      "description": "Der Historismus des 19. Jahrhunderts greift bewusst auf ältere Baustile zurück. Gebäude können etwa neugotisch, neorenaissancehaft oder neobarock gestaltet sein; teilweise werden mehrere historische Stilformen miteinander gemischt."
+    }
   ],
   "stations": [
     {
@@ -29,8 +45,12 @@
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
-        "/stations/1/1_1.svg", "/stations/1/1_2.svg", "/stations/1/1_3.svg",
-        "/stations/1/1_4.svg", "/stations/1/1_5.svg", "/stations/1/1_6.svg"
+        "/stations/1/1_1.svg",
+        "/stations/1/1_2.svg",
+        "/stations/1/1_3.svg",
+        "/stations/1/1_4.svg",
+        "/stations/1/1_5.svg",
+        "/stations/1/1_6.svg"
       ]
     },
     {
@@ -40,8 +60,12 @@
       "answerLabel": "Antwort",
       "taskPoints": 5,
       "images": [
-        "/stations/2/2_1.svg", "/stations/2/2_2.svg", "/stations/2/2_3.svg",
-        "/stations/2/2_4.svg", "/stations/2/2_5.svg", "/stations/2/2_6.svg"
+        "/stations/2/2_1.svg",
+        "/stations/2/2_2.svg",
+        "/stations/2/2_3.svg",
+        "/stations/2/2_4.svg",
+        "/stations/2/2_5.svg",
+        "/stations/2/2_6.svg"
       ]
     },
     {
@@ -51,8 +75,12 @@
       "answerLabel": "Antwort",
       "taskPoints": 5,
       "images": [
-        "/stations/3/3_1.svg", "/stations/3/3_2.svg", "/stations/3/3_3.svg",
-        "/stations/3/3_4.svg", "/stations/3/3_5.svg", "/stations/3/3_6.svg"
+        "/stations/3/3_1.svg",
+        "/stations/3/3_2.svg",
+        "/stations/3/3_3.svg",
+        "/stations/3/3_4.svg",
+        "/stations/3/3_5.svg",
+        "/stations/3/3_6.svg"
       ]
     }
   ]

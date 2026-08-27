@@ -54,14 +54,14 @@ export function GuinnessTab({ entries, refresh, locked }: { entries: GuinnessEnt
   }
 
   return <section className="tab-page">
-    <div className="section-title"><div><div className="eyebrow">CHALLENGE</div><h2>Guinness</h2></div><span className="count-badge">{entries.length * scoringConfig.guinnessPerLogo} P.</span></div>
+    <div className="tab-score-row"><span className="count-badge">{entries.length * scoringConfig.guinnessPerLogo} P.</span></div>
     <div className="rule-box">
       <b>Regeln</b>
-      <p>Außen-Schild eines Pubs. Harfe + Guinness-Schriftzug müssen sichtbar sein.</p>
-      <p>Verschiedene Pubs. Mindestens 3. Jedes gültige Foto: {scoringConfig.guinnessPerLogo} Punkt{scoringConfig.guinnessPerLogo === 1 ? '' : 'e'}.</p>
+      <p>Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren. Harfe + Guinness-Schriftzug müssen sichtbar sein.</p>
+      <p>Jedes gültige Foto: {scoringConfig.guinnessPerLogo} Punkt{scoringConfig.guinnessPerLogo === 1 ? '' : 'e'}.</p>
     </div>
     {!locked && <form className="upload-form" onSubmit={add}>
-      <label className="file-button">Foto auswählen<input id="guinness-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className="file-button">Foto machen<input id="guinness-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
       <label>Straße<input value={street} onChange={(e) => setStreet(e.target.value)} /></label>
       <button className="primary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
@@ -77,8 +77,8 @@ export function GuinnessTab({ entries, refresh, locked }: { entries: GuinnessEnt
 
 export function ArchitectureTab({ entries, styles, refresh, locked }: { entries: ArchitectureEntry[]; styles: RallyeConfig['architectureStyles']; refresh: () => Promise<void>; locked: boolean }) {
   return <section className="tab-page">
-    <div className="section-title"><div><div className="eyebrow">CHALLENGE</div><h2>Architektur</h2></div><span className="count-badge">{entries.length * scoringConfig.architecturePerStyle} P.</span></div>
-    <div className="rule-box"><b>Regeln</b><p>Je ein Gebäude pro Stil. Gebäudename + Foto hochladen.</p></div>
+    <div className="tab-score-row"><span className="count-badge">{entries.length * scoringConfig.architecturePerStyle} P.</span></div>
+    <div className="rule-box"><b>Regeln</b><p>Je ein Gebäude pro Stil direkt in der App fotografieren. Gebäudename eintragen und hochladen.</p></div>
     <div className="style-list">{styles.map((style) => {
       const entry = entries.find((e) => e.style === style.name);
       return <ArchitectureStyle key={style.name} style={style} entry={entry} refresh={refresh} locked={locked} />;
@@ -120,7 +120,7 @@ function ArchitectureStyle({ style, entry, refresh, locked }: { style: RallyeCon
       {entry.image_url && <img className="style-image" src={entry.image_url} alt={style.name} />}
       <div className="entry-row"><b>{entry.building_name}</b>{!locked && <button className="danger-link" onClick={remove}>Löschen</button>}</div>
     </> : !locked ? <form className="upload-form compact" onSubmit={add}>
-      <label className="file-button">Foto auswählen<input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className="file-button">Foto machen<input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
       <label>Gebäudename<input value={name} onChange={(e) => setName(e.target.value)} /></label>
       <button className="secondary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
@@ -160,14 +160,14 @@ export function BeerTab({ beers, refresh, locked }: { beers: Beer[]; refresh: ()
   }
 
   return <section className="tab-page">
-    <div className="section-title"><div><div className="eyebrow">CHALLENGE</div><h2>Wegbier</h2></div><span className="count-badge">{beers.length * scoringConfig.beerPerUniqueCan} P.</span></div>
+    <div className="tab-score-row"><span className="count-badge">{beers.length * scoringConfig.beerPerUniqueCan} P.</span></div>
     <div className="rule-box">
       <b>Regeln</b>
       <p>{scoringConfig.beerPerUniqueCan} Punkt pro unterschiedlichem Dosenbier. Kein Radler, Cider oder alkoholfreies Bier.</p>
-      <p>Sorten zählen getrennt: z. B. Stiegl, Stiegl Goldbräu und Stiegl Hell. 0,33 l und 0,5 l derselben Sorte zählen nicht doppelt.</p>
+      <p>Sorten zählen getrennt: z. B. Stiegl Goldbräu und Stiegl Hell. 0,33 l und 0,5 l derselben Sorte zählen nicht doppelt.</p>
     </div>
     {!locked && <form className="upload-form" onSubmit={add}>
-      <label className="file-button">Foto auswählen<input id="beer-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className="file-button">Foto machen<input id="beer-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
       <label>Bier<input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="z. B. Stiegl Goldbräu" /></label>
       <button className="primary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>

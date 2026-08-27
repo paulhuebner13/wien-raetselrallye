@@ -200,3 +200,8 @@ git push
 ```
 
 Vercel deployt automatisch.
+
+
+## Update: Auswertung
+
+Nach diesem Update die Datei `supabase/schema.sql` erneut komplett im Supabase SQL Editor ausführen. Sie ergänzt die Tabelle `evaluations` für die Admin-Wertung. Bestehende Daten bleiben erhalten.

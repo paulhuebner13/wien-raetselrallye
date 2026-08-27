@@ -59,6 +59,16 @@ create table if not exists public.architecture_entries (
   unique (team_id, style)
 );
 
+
+create table if not exists public.evaluations (
+  team_id uuid not null references public.teams(id) on delete cascade,
+  item_type text not null check (item_type in ('question','station','guinness','architecture','beer')),
+  item_id text not null,
+  is_valid boolean not null default false,
+  updated_at timestamptz not null default now(),
+  primary key (team_id, item_type, item_id)
+);
+
 create table if not exists public.app_settings (
   key text primary key,
   value jsonb not null,
@@ -81,6 +91,7 @@ alter table public.quiz_answers enable row level security;
 alter table public.beers enable row level security;
 alter table public.guinness_entries enable row level security;
 alter table public.architecture_entries enable row level security;
+alter table public.evaluations enable row level security;
 alter table public.app_settings enable row level security;
 alter table public.picture_round_images enable row level security;
 
@@ -98,5 +109,6 @@ grant all on table public.quiz_answers to service_role;
 grant all on table public.beers to service_role;
 grant all on table public.guinness_entries to service_role;
 grant all on table public.architecture_entries to service_role;
+grant all on table public.evaluations to service_role;
 grant all on table public.app_settings to service_role;
 grant all on table public.picture_round_images to service_role;

@@ -6,7 +6,7 @@ import { getDeadlineAt } from '@/lib/deadline';
 export async function GET() {
   if (!(await requireAdmin())) return bad('Nicht erlaubt.', 401);
   const db = supabaseAdmin();
-  const [teams, progress, quiz, beers, guinness, architecture, pictures, deadlineAt] = await Promise.all([
+  const [teams, progress, quiz, beers, guinness, architecture, pictures, evaluations, deadlineAt] = await Promise.all([
     db.from('teams').select('id,name,station_order,created_at').order('name'),
     db.from('station_progress').select('*').order('station_id'),
     db.from('quiz_answers').select('*').order('question_id'),
@@ -14,9 +14,10 @@ export async function GET() {
     db.from('guinness_entries').select('*').order('created_at'),
     db.from('architecture_entries').select('*').order('created_at'),
     db.from('picture_round_images').select('*').order('slot'),
+    db.from('evaluations').select('*'),
     getDeadlineAt(),
   ]);
-  const anyError = [teams, progress, quiz, beers, guinness, architecture, pictures].find((r) => r.error)?.error;
+  const anyError = [teams, progress, quiz, beers, guinness, architecture, pictures, evaluations].find((r) => r.error)?.error;
   if (anyError) return bad(anyError.message, 500);
   const signTeam = async (path?: string | null) => {
     if (!path) return null;
@@ -31,5 +32,5 @@ export async function GET() {
   const guinnessSigned = await Promise.all((guinness.data ?? []).map(async (x) => ({ ...x, image_url: await signTeam(x.storage_path) })));
   const architectureSigned = await Promise.all((architecture.data ?? []).map(async (x) => ({ ...x, image_url: await signTeam(x.storage_path) })));
   const pictureRoundImages = await Promise.all((pictures.data ?? []).map(async (x) => ({ slot: x.slot, image_url: await signQuiz(x.storage_path) })));
-  return ok({ teams: teams.data ?? [], progress: progress.data ?? [], quiz: quiz.data ?? [], beers: beersSigned, guinness: guinnessSigned, architecture: architectureSigned, pictureRoundImages, deadlineAt });
+  return ok({ teams: teams.data ?? [], progress: progress.data ?? [], quiz: quiz.data ?? [], beers: beersSigned, guinness: guinnessSigned, architecture: architectureSigned, pictureRoundImages, evaluations: evaluations.data ?? [], deadlineAt });
 }

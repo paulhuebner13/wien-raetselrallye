@@ -9,15 +9,14 @@ export default function IntroModal({ config, onClose }: { config: RallyeConfig; 
       <div className="intro">
         <div className="eyebrow">REGELN</div>
         <h2>{config.intro.title}</h2>
-        <h3>So funktioniert&apos;s</h3>
         {config.intro.body.map((line) => <p key={line}>{line}</p>)}
         <h3>Handy</h3>
         <ul>{config.intro.phoneRules.map((line) => <li key={line}>{line}</li>)}</ul>
         <h3>Zusätzliche Challenges</h3>
         <ul>
-          <li><b>Guinness:</b> Außen-Schilder verschiedener Pubs fotografieren. Harfe + Guinness-Schriftzug müssen sichtbar sein. Mindestens 3.</li>
-          <li><b>Architektur:</b> 5 Gebäude in den vorgegebenen Stilen fotografieren.</li>
-          <li><b>Wegbier:</b> Verschiedene Dosenbiere trinken und mit Foto eintragen. Kein Radler, Cider oder alkoholfreies Bier.</li>
+          <li><b>Guinness:</b> Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren und direkt in der App hochladen. Harfe + Guinness-Schriftzug müssen sichtbar sein.</li>
+          <li><b>Architektur:</b> 5 Gebäude der vorgegebenen Stile fotografieren und direkt in der App hochladen.</li>
+          <li><b>Wegbier:</b> Verschiedene Dosenbiere trinken, direkt in der App fotografieren und eintragen. Kein Radler, Cider oder alkoholfreies Bier.</li>
         </ul>
         <button className="primary full" onClick={onClose}>Los geht&apos;s</button>
       </div>

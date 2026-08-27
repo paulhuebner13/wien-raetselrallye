@@ -30,6 +30,8 @@ type PathNode =
   | { key: string; kind: 'block'; label: string; block: QuestionBlock; state: 'done' | 'open' | 'locked' }
   | { key: string; kind: 'review'; label: string; state: 'open' | 'locked' };
 
+type PathCell = PathNode | null;
+
 function formatRemaining(ms: number) {
   if (ms <= 0) return '00:00:00';
   const total = Math.floor(ms / 1000);
@@ -42,7 +44,7 @@ function formatRemaining(ms: number) {
 export default function RallyeApp({ config, blocks, teamName }: { config: RallyeConfig; blocks: QuestionBlock[]; teamName: string }) {
   const router = useRouter();
   const [tab, setTab] = useState<'rallye' | 'guinness' | 'architecture' | 'beer'>('rallye');
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
   const [state, setState] = useState<TeamState | null>(null);
   const [open, setOpen] = useState<OpenItem>(null);
   const [error, setError] = useState('');
@@ -59,41 +61,62 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
   useEffect(() => { refresh(); }, [refresh]);
   useEffect(() => { const id = setInterval(refresh, 5000); return () => clearInterval(id); }, [refresh]);
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
+  useEffect(() => {
+    if (sessionStorage.getItem('rallye-show-intro') === '1') {
+      sessionStorage.removeItem('rallye-show-intro');
+      setShowIntro(true);
+    }
+  }, []);
 
   const deadlineMs = state?.deadlineAt ? new Date(state.deadlineAt).getTime() : null;
   const localLocked = !!state && (state.locked || (deadlineMs !== null && now >= deadlineMs));
   const remaining = deadlineMs === null ? null : deadlineMs - now;
-  const groupedBlocks = useMemo(() => distributeBlocks(blocks, config.stations.length), [blocks, config.stations.length]);
+
   const orderedStations = useMemo(() => {
     if (!state) return [];
     return state.stationOrder.map((id) => config.stations.find((s) => s.id === id)).filter(Boolean) as RallyeConfig['stations'];
   }, [state, config.stations]);
 
-  const nodes = useMemo<PathNode[]>(() => {
+  const regularStations = useMemo(() => orderedStations.filter((s) => s.id !== config.finalStationId), [orderedStations, config.finalStationId]);
+  const finalStation = useMemo(() => orderedStations.find((s) => s.id === config.finalStationId), [orderedStations, config.finalStationId]);
+  const groupedBlocks = useMemo(() => distributeBlocks(blocks, Math.max(1, regularStations.length)), [blocks, regularStations.length]);
+
+  const mainNodes = useMemo<PathNode[]>(() => {
     if (!state) return [];
     const out: PathNode[] = [];
-    orderedStations.forEach((station, index) => {
+    regularStations.forEach((station, index) => {
       const ss = state.stationStates.find((s) => s.stationId === station.id)!;
       out.push({ key: `s-${station.id}`, kind: 'station', label: `Station ${index + 1}`, stationId: station.id, state: ss.submitted ? 'done' : ss.unlocked ? 'open' : 'locked' });
       const blockUnlocked = ss.submitted;
-      groupedBlocks[index].forEach((block) => {
+      (groupedBlocks[index] ?? []).forEach((block) => {
         const complete = block.questions.every((q) => (state.quiz[q.id] ?? '').trim());
         out.push({ key: `b-${block.id}`, kind: 'block', label: blockLabel(block), block, state: complete ? 'done' : blockUnlocked ? 'open' : 'locked' });
       });
     });
-    out.push({ key: 'review', kind: 'review', label: 'Antworten prüfen', state: state.reviewUnlocked ? 'open' : 'locked' });
     return out;
-  }, [state, orderedStations, groupedBlocks]);
+  }, [state, regularStations, groupedBlocks]);
 
-  const rows = useMemo(() => {
-    const pairs: PathNode[][] = [];
-    for (let i = 0; i < nodes.length; i += 2) {
-      const pair = nodes.slice(i, i + 2);
+  const rows = useMemo<PathCell[][]>(() => {
+    if (!state) return [];
+    const result: PathCell[][] = [];
+    for (let i = 0; i < mainNodes.length; i += 2) {
+      const pair: PathCell[] = mainNodes.slice(i, i + 2);
       if ((i / 2) % 2 === 1) pair.reverse();
-      pairs.push(pair);
+      if (pair.length === 1) pair.push(null);
+      result.push(pair);
     }
-    return pairs;
-  }, [nodes]);
+
+    const review: PathNode = { key: 'review', kind: 'review', label: 'Antworten prüfen', state: state.reviewUnlocked ? 'open' : 'locked' };
+    if (result.length && result[result.length - 1][1] === null) result[result.length - 1][1] = review;
+    else result.push([null, review]);
+
+    if (finalStation) {
+      const fs = state.stationStates.find((s) => s.stationId === finalStation.id)!;
+      const finalNode: PathNode = { key: `s-${finalStation.id}`, kind: 'station', label: finalStation.title, stationId: finalStation.id, state: fs.submitted ? 'done' : fs.unlocked ? 'open' : 'locked' };
+      result.push([finalNode, null]);
+    }
+    return result;
+  }, [state, mainNodes, finalStation]);
 
   async function logout() { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/'); router.refresh(); }
   function openNode(node: PathNode) {
@@ -119,10 +142,9 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
 
     <div className="content-area">
       {tab === 'rallye' && <section className="path-wrap">{rows.map((row, rowIndex) => <div className="path-row" key={rowIndex}>
-        {row.map((node) => <button key={node.key} className={`path-node ${node.kind} ${node.state}`} onClick={() => openNode(node)} disabled={node.state === 'locked'}>
+        {row.map((node, cellIndex) => node ? <button key={node.key} className={`path-node ${node.kind} ${node.state}`} onClick={() => openNode(node)} disabled={node.state === 'locked'}>
           <span className="node-icon">{node.kind === 'station' ? '●' : node.kind === 'block' ? '?' : '✓'}</span><span>{node.label}</span>
-        </button>)}
-        {row.length === 1 && <div />}
+        </button> : <div className="path-placeholder" key={`empty-${cellIndex}`} />)}
       </div>)}</section>}
       {tab === 'guinness' && <GuinnessTab entries={state.guinness} refresh={refresh} locked={localLocked} />}
       {tab === 'architecture' && <ArchitectureTab entries={state.architecture} styles={config.architectureStyles} refresh={refresh} locked={localLocked} />}
