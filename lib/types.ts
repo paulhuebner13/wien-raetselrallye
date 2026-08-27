@@ -25,7 +25,16 @@ export type Question = {
 
 export type QuestionBlock = {
   id: string;
+  name: string;
   categories: string[];
+  questions: Question[];
+  durationMinutes: number;
+};
+
+export type QuestionsConfig = {
+  blockDurationMinutes: number;
+  categories: string[];
+  blocks: Array<{ id: string; name: string; categories: string[] }>;
   questions: Question[];
 };
 
@@ -53,6 +62,7 @@ export type ScoringConfig = {
   pictureRoundPartialPoints: number;
   pictureRoundFullPoints: number;
   musicRoundPerCorrect: number;
+  musicRoundStagePoints: [number, number, number, number];
   guinnessPerLogo: number;
   architecturePerStyle: number;
   beerPerUniqueCan: number;

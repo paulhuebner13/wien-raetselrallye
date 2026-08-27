@@ -20,6 +20,14 @@ create table if not exists public.station_progress (
   primary key (team_id, station_id)
 );
 
+
+create table if not exists public.quiz_block_progress (
+  team_id uuid not null references public.teams(id) on delete cascade,
+  block_id text not null,
+  started_at timestamptz not null default now(),
+  primary key (team_id, block_id)
+);
+
 create table if not exists public.quiz_answers (
   team_id uuid not null references public.teams(id) on delete cascade,
   question_id text not null,
@@ -79,9 +87,14 @@ insert into public.app_settings (key, value)
 values ('deadline', '{"deadlineAt": null}'::jsonb)
 on conflict (key) do nothing;
 
+insert into public.app_settings (key, value)
+values ('quiz_timer', '{"enabled": true, "durations": {}}'::jsonb)
+on conflict (key) do nothing;
+
 alter table public.teams enable row level security;
 alter table public.station_progress enable row level security;
 alter table public.quiz_answers enable row level security;
+alter table public.quiz_block_progress enable row level security;
 alter table public.beers enable row level security;
 alter table public.guinness_entries enable row level security;
 alter table public.architecture_entries enable row level security;
@@ -96,6 +109,7 @@ on conflict (id) do nothing;
 grant all on table public.teams to service_role;
 grant all on table public.station_progress to service_role;
 grant all on table public.quiz_answers to service_role;
+grant all on table public.quiz_block_progress to service_role;
 grant all on table public.beers to service_role;
 grant all on table public.guinness_entries to service_role;
 grant all on table public.architecture_entries to service_role;

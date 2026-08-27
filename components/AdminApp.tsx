@@ -3,12 +3,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { blockLabel, questionBlocks, questionMaxPoints, questionPoints, rallyeConfig, stationTaskPoints } from '@/lib/config';
 import type { Question, ScoringConfig } from '@/lib/types';
+import type { MusicRoundSettings } from '@/lib/music-round-settings';
+import { parseMusicAnswer } from '@/lib/music-answer';
 
 type EvalType = 'question' | 'station' | 'guinness' | 'architecture' | 'beer';
 type Team = { id: string; name: string; station_order: number[] | null };
 type Constraint = { id: number; a: string; b: string; mode: 'together' | 'apart' };
 type DrawSettings = { playerText: string; teamCount: number; constraints: Constraint[]; drawResult: string[][] | null };
-type NumericScoringKey = 'guinnessPerLogo' | 'architecturePerStyle' | 'beerPerUniqueCan' | 'pictureRoundPartialThreshold' | 'pictureRoundPartialPoints' | 'pictureRoundFullPoints' | 'musicRoundPerCorrect';
+type QuizTimerSettings = { enabled: boolean; durations: Record<string, number> };
+type NumericScoringKey = 'guinnessPerLogo' | 'architecturePerStyle' | 'beerPerUniqueCan' | 'pictureRoundPartialThreshold' | 'pictureRoundPartialPoints' | 'pictureRoundFullPoints';
 type Overview = {
   teams: Team[];
   progress: Array<{ team_id: string; station_id: number; answer: string | null; submitted_at: string | null; hints_used: number; score_percent: number | null }>;
@@ -19,6 +22,8 @@ type Overview = {
   evaluations: Array<{ team_id: string; item_type: EvalType; item_id: string; is_valid: boolean }>;
   deadlineAt: string | null;
   scoring: ScoringConfig;
+  quizTimer: QuizTimerSettings;
+  musicRoundSettings: MusicRoundSettings;
   drawSettings: DrawSettings | null;
 };
 
@@ -88,6 +93,10 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
   const [teamPassword, setTeamPassword] = useState('');
   const [error, setError] = useState('');
   const [deadlineLocal, setDeadlineLocal] = useState('');
+  const [quizTimerDraft, setQuizTimerDraft] = useState<QuizTimerSettings | null>(null);
+  const [quizTimerSaveState, setQuizTimerSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [musicRoundDraft, setMusicRoundDraft] = useState<MusicRoundSettings | null>(null);
+  const [musicRoundSaveState, setMusicRoundSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [orderInputs, setOrderInputs] = useState<Record<string, string>>({});
   const [playerText, setPlayerText] = useState('');
   const [drawTeamCount, setDrawTeamCount] = useState(2);
@@ -112,6 +121,8 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     setOverview(data);
     setDeadlineLocal(toLocalInput(data.deadlineAt));
     setScoringDraft(data.scoring);
+    setQuizTimerDraft(data.quizTimer);
+    setMusicRoundDraft(data.musicRoundSettings);
     setOrderInputs(Object.fromEntries((data.teams as Team[]).map((t) => [t.id, (validConfiguredOrder(t.station_order) ? t.station_order! : defaultOrder()).join(', ')])));
     if (!drawHydrated.current) {
       const saved = data.drawSettings as DrawSettings | null;
@@ -143,6 +154,45 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
   async function deleteTeam(id: string, teamName: string) { if (!confirm(`${teamName} wirklich löschen? Alle Daten werden gelöscht.`)) return; await fetch('/api/admin/teams', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); await load(); }
   async function resetStation(teamId: string, stationId: number) { if (!confirm('Stationsantwort zurücksetzen?')) return; await fetch('/api/admin/reset-station', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, stationId }) }); await load(); }
   async function saveDeadline() { const deadlineAt = deadlineLocal ? new Date(deadlineLocal).toISOString() : null; const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deadlineAt }) }); if (!res.ok) return setError((await res.json()).error ?? 'Fehler.'); await load(); }
+  function setBlockDuration(blockId: string, value: number) { const safe = Number.isFinite(value) ? Math.min(180, Math.max(1, Math.round(value))) : 5; setQuizTimerDraft((current) => current ? { ...current, durations: { ...current.durations, [blockId]: safe } } : current); }
+  async function saveQuizTimer() {
+    if (!quizTimerDraft) return;
+    setQuizTimerSaveState('saving');
+    const res = await fetch('/api/admin/quiz-timer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(quizTimerDraft) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setQuizTimerSaveState('error'); return setError(data.error ?? 'Fehler.'); }
+    setQuizTimerDraft(data.quizTimer);
+    setOverview((current) => current ? { ...current, quizTimer: data.quizTimer } : current);
+    setQuizTimerSaveState('saved');
+  }
+  function setMusicDuration(index: number, value: number) {
+    setMusicRoundDraft((current) => {
+      if (!current) return current;
+      const next = [...current.stageDurationsSeconds] as [number, number, number, number];
+      next[index] = Number.isFinite(value) ? Math.max(0.5, Math.min(120, value)) : next[index];
+      return { ...current, stageDurationsSeconds: next };
+    });
+  }
+  async function saveMusicRoundSettings() {
+    if (!musicRoundDraft) return;
+    setMusicRoundSaveState('saving');
+    const res = await fetch('/api/admin/music-round-settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(musicRoundDraft) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { setMusicRoundSaveState('error'); return setError(data.error ?? 'Fehler.'); }
+    setMusicRoundDraft(data.musicRoundSettings);
+    setOverview((current) => current ? { ...current, musicRoundSettings: data.musicRoundSettings } : current);
+    setMusicRoundSaveState('saved');
+  }
+  function setMusicStagePoint(index: number, value: number) {
+    const safe = Number.isFinite(value) ? Math.max(0, value) : 0;
+    setScoringDraft((current) => {
+      if (!current) return current;
+      const points = [...current.musicRoundStagePoints] as [number, number, number, number];
+      points[index] = safe;
+      return { ...current, musicRoundStagePoints: points };
+    });
+  }
+
   async function saveOrder(teamId: string) { const stationOrder = (orderInputs[teamId] ?? '').split(',').map((x) => Number(x.trim())).filter(Number.isFinite); const res = await fetch('/api/admin/team-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, stationOrder }) }); const data = await res.json(); if (!res.ok) return setError(data.error ?? 'Fehler.'); await load(); }
   async function setEvaluation(teamId: string, itemType: EvalType, itemId: string, isValid: boolean) {
     const res = await fetch('/api/admin/evaluation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, itemType, itemId, isValid }) });
@@ -163,7 +213,15 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
   function specialQuestionScore(teamId: string, q: Question) {
     if (!scoring) return 0;
     if (q.type === 'picture_round') return pictureRoundScore(teamId, q);
-    if (q.type === 'music_round') return (q.tracks ?? []).filter((_, i) => evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)).length * scoring.musicRoundPerCorrect;
+    if (q.type === 'music_round') {
+      const tracks = q.tracks ?? [];
+      const music = parseMusicAnswer(teamAnswerMap(teamId)[q.id], tracks.length);
+      return tracks.reduce((sum, _, i) => {
+        if (!evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)) return sum;
+        const stage = Math.min(4, Math.max(1, music.stages[i] ?? 1));
+        return sum + (scoring.musicRoundStagePoints[stage - 1] ?? 0);
+      }, 0);
+    }
     return evaluationIsValid(teamId, 'question', q.id) ? questionPoints(q.id, scoring) : 0;
   }
   function teamScore(teamId: string) {
@@ -205,13 +263,26 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
   }
 
   if (!loggedIn) return <main className="login-shell"><section className="login-card"><div className="eyebrow">ADMIN</div><h1>Rätselrallye</h1><form className="stack" onSubmit={login}><label>Passwort<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>{error && <p className="error-text">{error}</p>}<button className="primary">Login</button></form></section></main>;
-  if (!overview || !scoring || !scoringDraft) return <main className="loading-screen">Lädt…</main>;
+  if (!overview || !scoring || !scoringDraft || !quizTimerDraft) return <main className="loading-screen">Lädt…</main>;
 
   return <main className="admin-shell">
     <header className="admin-header"><div><div className="eyebrow">ADMIN</div><h1>Übersicht</h1></div><button className="text-button" onClick={logout}>Logout</button></header>
     {error && <p className="error-text">{error}</p>}
 
-    <section className="admin-panel"><h2>Zeitlimit</h2><p className="muted">Vergangenheit oder Zukunft. Neuer Zeitpunkt in der Zukunft entsperrt wieder.</p><div className="admin-inline"><input type="datetime-local" step="1" value={deadlineLocal} onChange={(e) => setDeadlineLocal(e.target.value)} /><button className="primary" onClick={saveDeadline}>Speichern</button><button className="secondary" onClick={() => setDeadlineLocal('')}>Leeren</button></div></section>
+    <section className="admin-panel"><h2>Zeitlimit</h2><p className="muted">Gesamt-Zeitlimit bis Johnny's Pub. Leer = kein Gesamt-Zeitlimit.</p><div className="admin-inline"><input type="datetime-local" step="1" value={deadlineLocal} onChange={(e) => setDeadlineLocal(e.target.value)} /><button className="primary" onClick={saveDeadline}>Speichern</button><button className="secondary" onClick={() => setDeadlineLocal('')}>Leeren</button></div></section>
+
+    <section className="admin-panel">
+      <div className="section-title-row"><div><h2>Fragenblock-Timer</h2><p className="muted">Aus: Fragen bleiben bis zum Gesamt-Zeitlimit bearbeitbar. An: jeder Block hat seine eigene Zeit.</p></div><button className="primary" onClick={saveQuizTimer}>{quizTimerSaveState === 'saving' ? 'Speichert…' : 'Speichern'}</button></div>
+      <label className="timer-toggle"><input type="checkbox" checked={quizTimerDraft.enabled} onChange={(e) => setQuizTimerDraft((current) => current ? { ...current, enabled: e.target.checked } : current)} /><span>Timer für Fragenblöcke aktivieren</span></label>
+      {quizTimerDraft.enabled && <div className="block-duration-grid">{questionBlocks.map((block) => <label key={block.id}><span>{blockLabel(block)}</span><div><input type="number" min="1" max="180" value={quizTimerDraft.durations[block.id] ?? 5} onChange={(e) => setBlockDuration(block.id, Number(e.target.value))} /><span>Min.</span></div></label>)}</div>}
+      {quizTimerSaveState === 'saved' && <p className="saved-text">Gespeichert.</p>}
+    </section>
+
+    {musicRoundDraft && <section className="admin-panel">
+      <div className="section-title-row"><div><h2>Music Round</h2><p className="muted">Länge der vier Hörstufen. Die Zeiten sind Sekunden ab Songbeginn.</p></div><button className="primary" onClick={saveMusicRoundSettings}>{musicRoundSaveState === 'saving' ? 'Speichert…' : 'Speichern'}</button></div>
+      <div className="music-admin-grid">{musicRoundDraft.stageDurationsSeconds.map((seconds, i) => <label key={i}>Stufe {i + 1}<div><input type="number" min={i === 0 ? 0.5 : musicRoundDraft.stageDurationsSeconds[i - 1] + 0.5} max="120" step="0.5" value={seconds} onChange={(e) => setMusicDuration(i, Number(e.target.value))} /><span>Sek.</span></div></label>)}</div>
+      {musicRoundSaveState === 'saved' && <p className="saved-text">Gespeichert.</p>}
+    </section>}
 
     <section className="admin-panel"><h2>Teams</h2><form className="admin-team-form" onSubmit={addTeam}><input placeholder="Teamname" value={name} onChange={(e) => setName(e.target.value)} /><input placeholder="Passwort" value={teamPassword} onChange={(e) => setTeamPassword(e.target.value)} /><button className="primary">Hinzufügen</button></form><div className="team-order-list">{overview.teams.map((t) => <div className="team-order-row" key={t.id}><b>{t.name}</b><label>Stations-Reihenfolge<input value={orderInputs[t.id] ?? ''} onChange={(e) => setOrderInputs((x) => ({ ...x, [t.id]: e.target.value }))} /></label><button className="secondary" onClick={() => saveOrder(t.id)}>Speichern</button><button className="danger-link" onClick={() => deleteTeam(t.id, t.name)}>Löschen</button></div>)}</div><p className="muted">Alle Stations-IDs genau einmal, z. B. 2, 4, 1, 3. Johnny's Pub gehört nicht zur Reihenfolge.</p></section>
 
@@ -233,14 +304,14 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
         <label>Picture Round: ab richtig<input type="number" min="1" max="8" value={scoringDraft.pictureRoundPartialThreshold} onChange={(e) => setScoreField('pictureRoundPartialThreshold', Number(e.target.value))} /></label>
         <label>Picture Round Teilpunkte<input type="number" min="0" value={scoringDraft.pictureRoundPartialPoints} onChange={(e) => setScoreField('pictureRoundPartialPoints', Number(e.target.value))} /></label>
         <label>Picture Round 8/8<input type="number" min="0" value={scoringDraft.pictureRoundFullPoints} onChange={(e) => setScoreField('pictureRoundFullPoints', Number(e.target.value))} /></label>
-        <label>Music Round / richtiger Song<input type="number" min="0" value={scoringDraft.musicRoundPerCorrect} onChange={(e) => setScoreField('musicRoundPerCorrect', Number(e.target.value))} /></label>
+        {scoringDraft.musicRoundStagePoints.map((points, i) => <label key={`music-points-${i}`}>Music Stufe {i + 1}<input type="number" min="0" step="0.5" value={points} onChange={(e) => setMusicStagePoint(i, Number(e.target.value))} /></label>)}
       </div>
       <h3>Stationen</h3><div className="scoring-editor-grid">{rallyeConfig.stations.map((station) => <label key={station.id}>{station.title}<input type="number" min="0" value={stationTaskPoints(station.id, scoringDraft)} onChange={(e) => setStationScore(station.id, Number(e.target.value))} /></label>)}</div>
       <h3>Quizfragen</h3><div className="scoring-question-list">{questionBlocks.flatMap((b) => b.questions).filter((q) => q.type !== 'picture_round' && q.type !== 'music_round').map((q) => <label key={q.id}><span><b>{q.category}</b><small>{q.text}</small></span><input type="number" min="0" value={questionPoints(q.id, scoringDraft)} onChange={(e) => setQuestionScore(q.id, Number(e.target.value))} /></label>)}</div>
       {scoringSaveState === 'saved' && <p className="saved-text">Gespeichert.</p>}
     </section>
 
-    <section className="admin-panel"><h2>Quiz-Dateien</h2><p className="muted">Picture Round: <code>public/picture-round/1.png</code> bis <code>8.png</code>. Music Round: <code>public/music-round/1.mp3</code> und <code>2.mp3</code>.</p></section>
+    <section className="admin-panel"><h2>Quiz-Dateien</h2><p className="muted">Picture Round: <code>public/picture-round/1.png</code> bis <code>8.png</code>. Music Round: <code>public/music-round/1.mp3</code> bis <code>4.mp3</code>.</p></section>
 
     <section className="admin-panel evaluation-panel">
       <h2>Auswertung</h2>
@@ -257,7 +328,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
         }
         if (q.type === 'music_round') {
           const tracks = q.tracks ?? [];
-          return <div className="evaluation-item special-comparison" key={q.id}><div className="evaluation-item-title"><b>{q.category}</b><span>{q.text}</span></div>{tracks.map((track, i) => <div className="music-eval-row" key={track.src}><audio controls preload="none" src={track.src} /><b>{track.label}</b>{teamColumns((team) => { const values = parseList(teamAnswerMap(team.id)[q.id], tracks.length); return <><p className="evaluation-response">{values[i] || '—'}</p><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'question', `${q.id}:${i + 1}`)} onChange={(e) => setEvaluation(team.id, 'question', `${q.id}:${i + 1}`, e.target.checked)} /> Richtig (+{scoring.musicRoundPerCorrect} P.)</label></>; })}</div>)} </div>;
+          return <div className="evaluation-item special-comparison" key={q.id}><div className="evaluation-item-title"><b>{q.category}</b><span>{q.text}</span></div>{tracks.map((track, i) => <div className="music-eval-row" key={track.src}><audio controls preload="none" src={track.src} /><b>{track.label}</b>{teamColumns((team) => { const music = parseMusicAnswer(teamAnswerMap(team.id)[q.id], tracks.length); const stage = Math.min(4, Math.max(1, music.stages[i] ?? 1)); const points = scoring.musicRoundStagePoints[stage - 1] ?? 0; return <><p className="evaluation-response">{music.answers[i] || '—'}</p><small>Stufe {stage}/4 · {overview.musicRoundSettings.stageDurationsSeconds[stage - 1]} Sek. · max. {String(points).replace('.', ',')} P.</small><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'question', `${q.id}:${i + 1}`)} onChange={(e) => setEvaluation(team.id, 'question', `${q.id}:${i + 1}`, e.target.checked)} /> Richtig (+{String(points).replace('.', ',')} P.)</label></>; })}</div>)}{teamColumns((team) => <strong className="special-score">Music Round → {specialQuestionScore(team.id, q)} P.</strong>)}</div>;
         }
         return <div className="evaluation-item" key={q.id}><div className="evaluation-item-title"><b>{q.category}</b><span>{q.text} · {questionMaxPoints(q.id, scoring)} P.</span></div>{teamColumns((team) => { const raw = teamAnswerMap(team.id)[q.id]; const content = q.type === 'matching' ? Object.entries(parseMap(raw)).map(([k, v]) => `${k}: ${v}`).join(' · ') : raw; return <><p className="evaluation-response">{content || '—'}</p><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'question', q.id)} onChange={(e) => setEvaluation(team.id, 'question', q.id, e.target.checked)} /> Richtig</label></>; })}</div>;
       })}

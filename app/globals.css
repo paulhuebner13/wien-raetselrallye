@@ -369,3 +369,122 @@ html, body { background: var(--bg); }
 @media (max-width: 420px) {
   .scoring-editor-grid { grid-template-columns: 1fr; }
 }
+
+/* Rallye-Pfad: einheitliche Quadrate und durchgehende Schlange */
+.path-wrap { --path-line: #8c725d; gap: 28px; padding-top: 14px; }
+.path-row { gap: 40px; min-height: 128px; }
+.path-row::before {
+  left: 25%;
+  right: 25%;
+  top: 50%;
+  border-top: 3px dashed var(--path-line);
+}
+.path-row:not(:last-child)::after {
+  top: 50%;
+  bottom: auto;
+  height: calc(100% + 28px);
+  border-left: 3px dashed var(--path-line);
+  right: 25%;
+}
+.path-row:nth-child(even):not(:last-child)::after { right: 25%; left: auto; }
+.path-row:nth-child(odd):not(:last-child)::after { right: auto; left: 25%; }
+.path-row.single::before { display: none; }
+.path-node {
+  width: min(128px, calc((100vw - 96px) / 2));
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 20px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.path-node.block { border-radius: 20px; }
+@media (max-width: 560px) {
+  .path-row { gap: 32px; min-height: 118px; }
+  .path-node { width: min(122px, calc((100vw - 88px) / 2)); font-size: 12px; }
+  .path-wrap { gap: 26px; }
+  .path-row:not(:last-child)::after { height: calc(100% + 26px); }
+}
+
+/* Stationshinweise sind fix 3:4 im Hochformat. */
+.station-image-wrap { aspect-ratio: 3 / 4; }
+
+/* Zeitlimit pro Fragenblock */
+.quiz-start-page { min-height: 100%; }
+.quiz-start-card {
+  max-width: 460px;
+  margin: 42px auto 0;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--card);
+  text-align: center;
+}
+.quiz-start-card h2 { margin: 10px 0 8px; }
+.quiz-start-card p { margin-bottom: 10px; }
+.quiz-start-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  background: var(--brown-dark, #2b211b);
+  color: #fffaf1;
+  font-size: 28px;
+  font-weight: 900;
+}
+.block-timer {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid #9d713a;
+  border-radius: 14px;
+  background: #fff3d9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--brown-dark, #2b211b);
+}
+.block-timer b { font-size: 24px; font-variant-numeric: tabular-nums; }
+.block-timer.expired { background: #e7e0d8; border-color: #b7aaa0; color: #665b52; }
+.path-node {
+  --node-size: min(128px, calc((100vw - 96px) / 2));
+  width: var(--node-size);
+  height: var(--node-size);
+  aspect-ratio: auto;
+  overflow: hidden;
+}
+@media (max-width: 560px) {
+  .path-node {
+    --node-size: min(122px, calc((100vw - 88px) / 2));
+    width: var(--node-size);
+    height: var(--node-size);
+  }
+}
+
+/* Fragenblock-Timer im Admin */
+.timer-toggle { display: flex; align-items: center; gap: 10px; margin: 14px 0; font-weight: 800; }
+.timer-toggle input { width: 22px; height: 22px; margin: 0; accent-color: var(--brown); }
+.block-duration-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.block-duration-grid > label { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--cream); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.block-duration-grid > label > span { font-weight: 800; min-width: 0; }
+.block-duration-grid > label > div { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.block-duration-grid input { width: 76px; }
+@media (max-width: 600px) { .block-duration-grid { grid-template-columns: 1fr; } }
+
+/* Staged Music Round */
+.staged-music-round { gap: 16px; }
+.staged-track { display: grid; gap: 11px; }
+.staged-track audio { display: none; }
+.music-track-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.music-track-head span { font-size: .82rem; color: var(--muted); font-weight: 700; }
+.music-preview-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.music-preview-controls button { flex: 1 1 150px; min-height: 44px; }
+.music-progress { height: 5px; overflow: hidden; border-radius: 999px; background: var(--line); }
+.music-progress > span { display: block; height: 100%; background: var(--brown); border-radius: inherit; transition: width .15s linear; }
+.music-admin-grid label > div { display: flex; align-items: center; gap: 8px; }
+.music-admin-grid input { min-width: 0; }

@@ -103,7 +103,7 @@ Die 8 Picture-Round-Bilder liegen in GitHub unter `public/picture-round/1.png` b
 
 ### Music Round
 
-Die beiden Audiodateien liegen unter `public/music-round/1.mp3` und `2.mp3`. Ersetze sie durch deine eigenen MP3s.
+Die vier Audiodateien liegen unter `public/music-round/1.mp3` bis `4.mp3`. Ersetze sie durch deine eigenen MP3s. Die vier Hörstufen und ihre Sekunden stellst du später im Admin ein.
 
 ## 6. Punkte
 
@@ -207,3 +207,8 @@ Vercel deployt automatisch.
 ## Update: Auswertung
 
 Nach diesem Update die Datei `supabase/schema.sql` erneut komplett im Supabase SQL Editor ausführen. Sie ergänzt die Tabelle `evaluations` für die Admin-Wertung. Bestehende Daten bleiben erhalten.
+
+
+## Update: Fragenblock-Timer
+
+Wenn du eine ältere Version der App bereits eingerichtet hast, führe die aktuelle Datei `supabase/schema.sql` einmal erneut im Supabase SQL Editor aus. Sie ergänzt die Tabelle `quiz_block_progress`. Bestehende Daten bleiben erhalten.

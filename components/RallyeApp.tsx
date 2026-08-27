@@ -2,17 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Question, QuestionBlock, RallyeConfig, ScoringConfig } from '@/lib/types';
+import type { QuestionBlock, RallyeConfig, ScoringConfig } from '@/lib/types';
+import type { MusicRoundSettings } from '@/lib/music-round-settings';
 import { blockLabel, distributeBlocks } from '@/lib/config';
 import IntroModal from './IntroModal';
 import StationView from './StationView';
 import QuizBlock from './QuizBlock';
 import { ArchitectureTab, BeerTab, GuinnessTab } from './ChallengeTabs';
 
+type BlockState = { timerEnabled: boolean; startedAt: string | null; expiresAt: string | null; durationMinutes: number };
 type TeamState = {
   team: { id: string; name: string };
   stationOrder: number[];
   stationStates: Array<{ stationId: number; unlocked: boolean; submitted: boolean; hintsUsed: number; hintPoints: number; answer: string; submittedAt: string | null; scorePercent: number | null }>;
+  blockStates: Record<string, BlockState>;
+  quizTimer: { enabled: boolean; durations: Record<string, number> };
   quiz: Record<string, string>;
   beers: Array<{ id: string; brand: string; image_url: string | null }>;
   guinness: Array<{ id: string; street: string; image_url: string | null }>;
@@ -22,6 +26,7 @@ type TeamState = {
   finalStationTitle: string;
   reviewUnlocked: boolean;
   scoring: ScoringConfig;
+  musicRoundSettings: MusicRoundSettings;
 };
 
 type OpenItem = { type: 'station'; id: number } | { type: 'block'; id: string } | { type: 'review' } | null;
@@ -41,29 +46,6 @@ function formatRemaining(ms: number) {
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
   return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
-}
-
-function parseList(value: string, count: number) {
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? Array.from({ length: count }, (_, i) => String(parsed[i] ?? '')) : Array(count).fill('');
-  } catch { return Array(count).fill(''); }
-}
-
-function parseMap(value: string) {
-  try { const parsed = JSON.parse(value); return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, string> : {}; }
-  catch { return {}; }
-}
-
-function questionComplete(q: Question, value: string) {
-  if (!value.trim()) return false;
-  if (q.type === 'picture_round') return parseList(value, q.images?.length ?? 8).every((v) => v.trim());
-  if (q.type === 'music_round') return parseList(value, q.tracks?.length ?? 2).every((v) => v.trim());
-  if (q.type === 'matching') {
-    const map = parseMap(value);
-    return (q.items ?? []).every((item) => String(map[item] ?? '').trim());
-  }
-  return true;
 }
 
 export default function RallyeApp({ config, blocks, teamName }: { config: RallyeConfig; blocks: QuestionBlock[]; teamName: string }) {
@@ -111,12 +93,13 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
       out.push({ key: `s-${station.id}`, kind: 'station', label: `Station ${index + 1}`, stationId: station.id, state: ss.submitted ? 'done' : ss.unlocked ? 'open' : 'locked' });
       const blockUnlocked = ss.submitted;
       (groupedBlocks[index] ?? []).forEach((block) => {
-        const complete = block.questions.every((q) => questionComplete(q, state.quiz[q.id] ?? ''));
-        out.push({ key: `b-${block.id}`, kind: 'block', label: blockLabel(block), block, state: complete ? 'done' : blockUnlocked ? 'open' : 'locked' });
+        const blockState = state.blockStates[block.id];
+        const expired = !!blockState?.timerEnabled && !!blockState?.expiresAt && now >= new Date(blockState.expiresAt).getTime();
+        out.push({ key: `b-${block.id}`, kind: 'block', label: blockLabel(block), block, state: expired ? 'done' : blockUnlocked ? 'open' : 'locked' });
       });
     });
     return out;
-  }, [state, orderedStations, groupedBlocks]);
+  }, [state, orderedStations, groupedBlocks, now]);
 
   const rows = useMemo<PathCell[][]>(() => {
     if (!state) return [];
@@ -147,6 +130,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
   const openStation = open?.type === 'station' ? config.stations.find((s) => s.id === open.id) : undefined;
   const openStationState = openStation ? state.stationStates.find((s) => s.stationId === openStation.id) : undefined;
   const openBlock = open?.type === 'block' ? blocks.find((b) => b.id === open.id) : undefined;
+  const openBlockState = openBlock ? state.blockStates[openBlock.id] : undefined;
 
   return <main className="app-shell">
     <header className="app-header">
@@ -183,7 +167,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
 
     {showIntro && <IntroModal config={config} onClose={() => setShowIntro(false)} />}
     {openStation && openStationState && <div className="full-sheet"><StationView station={openStation} state={openStationState} onClose={() => setOpen(null)} refresh={refresh} locked={localLocked} /></div>}
-    {openBlock && <div className="full-sheet"><QuizBlock block={openBlock} answers={state.quiz} locked={localLocked} scoring={state.scoring} onClose={() => setOpen(null)} /></div>}
-    {open?.type === 'review' && <div className="full-sheet"><QuizBlock review allBlocks={blocks} answers={state.quiz} locked={localLocked} scoring={state.scoring} onClose={() => setOpen(null)} /></div>}
+    {openBlock && <div className="full-sheet"><QuizBlock block={openBlock} blockState={openBlockState} answers={state.quiz} locked={localLocked} scoring={state.scoring} musicRoundSettings={state.musicRoundSettings} onStarted={refresh} onClose={() => setOpen(null)} /></div>}
+    {open?.type === 'review' && <div className="full-sheet"><QuizBlock review reviewEditable={!state.quizTimer.enabled && !localLocked} allBlocks={blocks} answers={state.quiz} locked={localLocked} scoring={state.scoring} musicRoundSettings={state.musicRoundSettings} onClose={() => setOpen(null)} /></div>}
   </main>;
 }

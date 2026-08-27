@@ -1,209 +1,233 @@
 {
+  "blockDurationMinutes": 5,
+  "categories": [
+    "Picture Round",
+    "Geographie",
+    "Geschichte",
+    "Politik",
+    "Sport",
+    "Natur",
+    "Bonusfrage",
+    "Literatur",
+    "Kunst",
+    "Computer",
+    "Wissenschaft",
+    "Film",
+    "Songs"
+  ],
   "blocks": [
     {
       "id": "block-1",
+      "name": "Picture Round",
       "categories": [
-        "Picture Round",
-        "Geographie"
-      ],
-      "questions": [
-        {
-          "id": "picture-round",
-          "category": "Picture Round",
-          "text": "Zu welchen berühmten Personen gehören die folgenden Geburtsorte (grün) und Sterbeorte (rot)?",
-          "type": "picture_round",
-          "images": [
-            "/picture-round/1.png",
-            "/picture-round/2.png",
-            "/picture-round/3.png",
-            "/picture-round/4.png",
-            "/picture-round/5.png",
-            "/picture-round/6.png",
-            "/picture-round/7.png",
-            "/picture-round/8.png"
-          ]
-        },
-        {
-          "id": "geo-neighbours",
-          "category": "Geographie",
-          "text": "Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."
-        },
-        {
-          "id": "geo-flags",
-          "category": "Geographie",
-          "text": "Welche Farbe kommt als einzige in den Flaggen von Brasilien, Sudan, Litauen und Aserbaidschan vor? Schwarz und Weiß zählen als Farben."
-        }
+        "Picture Round"
       ]
     },
     {
       "id": "block-2",
+      "name": "Geographie & Geschichte",
       "categories": [
-        "Geschichte",
-        "Politik",
-        "Geschichte / Antike"
-      ],
-      "questions": [
-        {
-          "id": "history-1",
-          "category": "Geschichte",
-          "text": "Geschichtsfrage 1 – hier ersetzen."
-        },
-        {
-          "id": "history-2",
-          "category": "Geschichte",
-          "text": "Geschichtsfrage 2 – hier ersetzen."
-        },
-        {
-          "id": "politics-1",
-          "category": "Politik",
-          "text": "Politikfrage 1 – hier ersetzen."
-        },
-        {
-          "id": "ancient-1",
-          "category": "Geschichte / Antike",
-          "text": "Antike-Frage – hier ersetzen."
-        }
+        "Geographie",
+        "Geschichte"
       ]
     },
     {
       "id": "block-3",
+      "name": "Politik & Sport",
       "categories": [
         "Politik",
-        "Sport",
-        "Natur / Allgemeinwissen"
-      ],
-      "questions": [
-        {
-          "id": "politics-2",
-          "category": "Politik",
-          "text": "Politikfrage 2 – hier ersetzen."
-        },
-        {
-          "id": "sport-founded",
-          "category": "Sport",
-          "text": "Ordnet diese Fußballclubs den Gründungsjahren zu. (1899, 1911, 1912, 1930)",
-          "type": "matching",
-          "items": [
-            "SV Ried",
-            "Austria Wien",
-            "Rapid Wien",
-            "WSG Tirol"
-          ],
-          "options": [
-            "1899",
-            "1911",
-            "1912",
-            "1930"
-          ]
-        },
-        {
-          "id": "nature-lizard",
-          "category": "Natur / Allgemeinwissen",
-          "text": "Welche ist die größte noch lebende Echse?"
-        }
-      ]
-    },
-    {
-      "id": "bonus",
-      "categories": [
-        "Bonus / Schätzfrage"
-      ],
-      "questions": [
-        {
-          "id": "bonus-alcohol",
-          "category": "Bonus / Schätzfrage",
-          "text": "Wie viele Liter reinen Alkohol werden in Österreich durchschnittlich pro Person ab 15 Jahren und Jahr konsumiert?"
-        }
+        "Sport"
       ]
     },
     {
       "id": "block-4",
+      "name": "Natur & Wissen",
       "categories": [
-        "Literatur",
-        "Kunst",
-        "Computer / Games"
-      ],
-      "questions": [
-        {
-          "id": "literature-1",
-          "category": "Literatur",
-          "text": "Literaturfrage – hier ersetzen."
-        },
-        {
-          "id": "art-1",
-          "category": "Kunst",
-          "text": "Kunstfrage – hier ersetzen."
-        },
-        {
-          "id": "games-1",
-          "category": "Computer / Games",
-          "text": "Games-Frage – hier ersetzen."
-        }
+        "Natur",
+        "Wissenschaft",
+        "Bonusfrage"
       ]
     },
     {
       "id": "block-5",
+      "name": "Literatur & Kunst",
       "categories": [
-        "Computer / Wissenschaft",
-        "Serien / Film",
-        "Film"
-      ],
-      "questions": [
-        {
-          "id": "science-1",
-          "category": "Computer / Wissenschaft",
-          "text": "Computer-/Wissenschaftsfrage – hier ersetzen."
-        },
-        {
-          "id": "series-1",
-          "category": "Serien / Film",
-          "text": "Serien-/Filmfrage – hier ersetzen."
-        },
-        {
-          "id": "film-1",
-          "category": "Film",
-          "text": "Filmfrage – hier ersetzen."
-        }
+        "Literatur",
+        "Kunst"
       ]
     },
     {
       "id": "block-6",
+      "name": "Computer & Film",
       "categories": [
-        "Song / Musik",
-        "Lyrics",
-        "Music Round"
+        "Computer",
+        "Film"
+      ]
+    },
+    {
+      "id": "block-7",
+      "name": "Songs",
+      "categories": [
+        "Songs"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "picture-round",
+      "category": "Picture Round",
+      "text": "Zu welchen berühmten Personen gehören die folgenden Geburtsorte (grün) und Sterbeorte (rot)?",
+      "type": "picture_round",
+      "images": [
+        "/picture-round/1.png",
+        "/picture-round/2.png",
+        "/picture-round/3.png",
+        "/picture-round/4.png",
+        "/picture-round/5.png",
+        "/picture-round/6.png",
+        "/picture-round/7.png",
+        "/picture-round/8.png"
+      ]
+    },
+    {
+      "id": "geo-neighbours",
+      "category": "Geographie",
+      "text": "Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."
+    },
+    {
+      "id": "geo-flags",
+      "category": "Geographie",
+      "text": "Welche Farbe kommt als einzige in den Flaggen von Brasilien, Sudan, Litauen und Aserbaidschan vor? Schwarz und Weiß zählen als Farben."
+    },
+    {
+      "id": "history-persia",
+      "category": "Geschichte",
+      "text": "Welches heutige Land hieß bis 1935 offiziell Persien?"
+    },
+    {
+      "id": "history-ireland-colony",
+      "category": "Geschichte",
+      "text": "Welches europäische Land gilt häufig als Englands älteste Kolonie?"
+    },
+    {
+      "id": "history-wonder",
+      "category": "Geschichte",
+      "text": "Welches der sieben Weltwunder der Antike existiert heute noch?"
+    },
+    {
+      "id": "politics-eu-members",
+      "category": "Politik",
+      "text": "Wie viele Mitgliedstaaten hat die Europäische Union?"
+    },
+    {
+      "id": "politics-south-africa-capitals",
+      "category": "Politik",
+      "text": "Welches Land hat drei Hauptstädte, auf die Legislative, Exekutive und Judikative verteilt sind?"
+    },
+    {
+      "id": "sport-founded",
+      "category": "Sport",
+      "text": "Ordnet diese Fußballclubs den Gründungsjahren 1899, 1911, 1912 und 1930 zu.",
+      "type": "matching",
+      "items": [
+        "Rapid Wien",
+        "Austria Wien",
+        "SV Ried",
+        "WSG Tirol"
       ],
-      "questions": [
+      "options": [
+        "1899",
+        "1911",
+        "1912",
+        "1930"
+      ]
+    },
+    {
+      "id": "sport-london-marathon-2026",
+      "category": "Sport",
+      "text": "Beim London Marathon 2026 wurde erstmals die Zwei-Stunden-Marke in einem offiziellen Marathon unterboten. Wie heißt der Läufer, der dabei den Weltrekord aufstellte?"
+    },
+    {
+      "id": "nature-lizard",
+      "category": "Natur",
+      "text": "Welche ist die größte noch lebende Echse?"
+    },
+    {
+      "id": "science-helium",
+      "category": "Wissenschaft",
+      "text": "Welches chemische Element hat die Ordnungszahl 2?"
+    },
+    {
+      "id": "bonus-alcohol",
+      "category": "Bonusfrage",
+      "text": "Wie viele Liter reinen Alkohol wurden in Österreich laut OECD 2024 durchschnittlich pro Person ab 15 Jahren konsumiert?"
+    },
+    {
+      "id": "literature-sherlock",
+      "category": "Literatur",
+      "text": "Wie lautet die vollständige Adresse von Sherlock Holmes? Straße allein reicht nicht."
+    },
+    {
+      "id": "art-kiss",
+      "category": "Kunst",
+      "text": "In welchem Wiener Museum ist Gustav Klimts Gemälde „Der Kuss“ ausgestellt?"
+    },
+    {
+      "id": "computer-gta-v",
+      "category": "Computer",
+      "text": "Wie heißt die fiktive Stadt in GTA V?"
+    },
+    {
+      "id": "film-friends-cafe",
+      "category": "Film",
+      "text": "Wie heißt das Café aus „Friends“?"
+    },
+    {
+      "id": "film-got-continent",
+      "category": "Film",
+      "text": "Wie heißt der Kontinent östlich von Westeros in der Welt von „Game of Thrones“?"
+    },
+    {
+      "id": "film-parasite-oscar",
+      "category": "Film",
+      "text": "Welcher Film war der erste nicht-englischsprachige Film, der den Oscar für den besten Film gewann?"
+    },
+    {
+      "id": "songs-freddie",
+      "category": "Songs",
+      "text": "Welcher Sänger wurde unter dem bürgerlichen Namen Farrokh Bulsara geboren?"
+    },
+    {
+      "id": "songs-woodstock",
+      "category": "Songs",
+      "text": "In welchem Jahrzehnt fand das Woodstock-Festival statt?"
+    },
+    {
+      "id": "songs-wonderwall-lyrics",
+      "category": "Songs",
+      "text": "„Maybe, you're gonna be the one that saves me“ – wie heißen Song und Interpret?"
+    },
+    {
+      "id": "music-round",
+      "category": "Songs",
+      "text": "Hört euch die vier Songs an und tragt jeweils den Titel ein.",
+      "type": "music_round",
+      "tracks": [
         {
-          "id": "music-1",
-          "category": "Song / Musik",
-          "text": "Musikfrage 1 – hier ersetzen."
+          "label": "Song 1",
+          "src": "/music-round/1.mp3"
         },
         {
-          "id": "music-2",
-          "category": "Song / Musik",
-          "text": "Musikfrage 2 – hier ersetzen."
+          "label": "Song 2",
+          "src": "/music-round/2.mp3"
         },
         {
-          "id": "lyrics-1",
-          "category": "Lyrics",
-          "text": "Lyrics-Frage – hier ersetzen."
+          "label": "Song 3",
+          "src": "/music-round/3.mp3"
         },
         {
-          "id": "music-round",
-          "category": "Music Round",
-          "text": "Hört euch beide Songs an und tragt jeweils den Titel ein.",
-          "type": "music_round",
-          "tracks": [
-            {
-              "label": "Song 1",
-              "src": "/music-round/1.mp3"
-            },
-            {
-              "label": "Song 2",
-              "src": "/music-round/2.mp3"
-            }
-          ]
+          "label": "Song 4",
+          "src": "/music-round/4.mp3"
         }
       ]
     }

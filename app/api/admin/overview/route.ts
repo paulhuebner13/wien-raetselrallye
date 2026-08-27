@@ -3,11 +3,13 @@ import { requireAdmin } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getDeadlineAt } from '@/lib/deadline';
 import { getScoringConfig } from '@/lib/scoring-settings';
+import { getQuizTimerSettings } from '@/lib/quiz-timer-settings';
+import { getMusicRoundSettings } from '@/lib/music-round-settings';
 
 export async function GET() {
   if (!(await requireAdmin())) return bad('Nicht erlaubt.', 401);
   const db = supabaseAdmin();
-  const [teams, progress, quiz, beers, guinness, architecture, evaluations, drawSettingsRes, deadlineAt, scoring] = await Promise.all([
+  const [teams, progress, quiz, beers, guinness, architecture, evaluations, drawSettingsRes, deadlineAt, scoring, quizTimer, musicRoundSettings] = await Promise.all([
     db.from('teams').select('id,name,station_order,created_at').order('name'),
     db.from('station_progress').select('*').order('station_id'),
     db.from('quiz_answers').select('*').order('question_id'),
@@ -18,6 +20,8 @@ export async function GET() {
     db.from('app_settings').select('value').eq('key', 'team_draw').maybeSingle(),
     getDeadlineAt(),
     getScoringConfig(),
+    getQuizTimerSettings(),
+    getMusicRoundSettings(),
   ]);
   const anyError = [teams, progress, quiz, beers, guinness, architecture, evaluations, drawSettingsRes].find((r) => r.error)?.error;
   if (anyError) return bad(anyError.message, 500);
@@ -32,6 +36,6 @@ export async function GET() {
   return ok({
     teams: teams.data ?? [], progress: progress.data ?? [], quiz: quiz.data ?? [], beers: beersSigned,
     guinness: guinnessSigned, architecture: architectureSigned, evaluations: evaluations.data ?? [], deadlineAt,
-    scoring, drawSettings: drawSettingsRes.data?.value ?? null,
+    scoring, quizTimer, musicRoundSettings, drawSettings: drawSettingsRes.data?.value ?? null,
   });
 }

@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     pictureRoundPartialPoints: nonNegative(merged.pictureRoundPartialPoints, 1),
     pictureRoundFullPoints: nonNegative(merged.pictureRoundFullPoints, 2),
     musicRoundPerCorrect: nonNegative(merged.musicRoundPerCorrect, 1),
+    musicRoundStagePoints: Array.from({ length: 4 }, (_, i) => nonNegative(merged.musicRoundStagePoints?.[i], [2, 1.5, 1, 0.5][i])) as [number, number, number, number],
     guinnessPerLogo: nonNegative(merged.guinnessPerLogo, 3),
     architecturePerStyle: nonNegative(merged.architecturePerStyle, 1),
     beerPerUniqueCan: nonNegative(merged.beerPerUniqueCan, 1),

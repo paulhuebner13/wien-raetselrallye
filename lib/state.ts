@@ -1,23 +1,29 @@
 import { supabaseAdmin } from './supabase-admin';
-import { rallyeConfig } from './config';
+import { questionBlocks, rallyeConfig } from './config';
 import { getScoringConfig } from './scoring-settings';
 import { getDeadlineAt } from './deadline';
 import { getTeamStationOrder } from './team-order';
+import { blockExpiresAt } from './quiz-blocks';
+import { getQuizTimerSettings } from './quiz-timer-settings';
+import { getMusicRoundSettings } from './music-round-settings';
 
 export async function getTeamState(teamId: string) {
   const db = supabaseAdmin();
-  const [progressRes, quizRes, beerRes, guinnessRes, architectureRes, deadlineAt, stationOrder, scoring] = await Promise.all([
+  const [progressRes, quizRes, blockRes, beerRes, guinnessRes, architectureRes, deadlineAt, stationOrder, scoring, quizTimer, musicRoundSettings] = await Promise.all([
     db.from('station_progress').select('*').eq('team_id', teamId),
     db.from('quiz_answers').select('*').eq('team_id', teamId),
+    db.from('quiz_block_progress').select('*').eq('team_id', teamId),
     db.from('beers').select('*').eq('team_id', teamId).order('brand'),
     db.from('guinness_entries').select('*').eq('team_id', teamId).order('created_at'),
     db.from('architecture_entries').select('*').eq('team_id', teamId).order('created_at'),
     getDeadlineAt(),
     getTeamStationOrder(teamId),
     getScoringConfig(),
+    getQuizTimerSettings(),
+    getMusicRoundSettings(),
   ]);
 
-  for (const result of [progressRes, quizRes, beerRes, guinnessRes, architectureRes]) {
+  for (const result of [progressRes, quizRes, blockRes, beerRes, guinnessRes, architectureRes]) {
     if (result.error) throw result.error;
   }
 
@@ -33,6 +39,7 @@ export async function getTeamState(teamId: string) {
 
   const progress = Object.fromEntries((progressRes.data ?? []).map((p) => [p.station_id, p]));
   const quiz = Object.fromEntries((quizRes.data ?? []).map((q) => [q.question_id, q.answer]));
+  const blockRows = Object.fromEntries((blockRes.data ?? []).map((row) => [row.block_id, row]));
 
   const stationStates = stationOrder.map((stationId, index) => {
     const row = progress[stationId];
@@ -49,10 +56,24 @@ export async function getTeamState(teamId: string) {
     };
   });
 
+  const blockStates = Object.fromEntries(questionBlocks.map((block) => {
+    const row = blockRows[block.id];
+    const startedAt = quizTimer.enabled ? (row?.started_at ?? null) : null;
+    const durationMinutes = quizTimer.durations[block.id] ?? block.durationMinutes ?? 5;
+    return [block.id, {
+      timerEnabled: quizTimer.enabled,
+      startedAt,
+      expiresAt: quizTimer.enabled && startedAt ? blockExpiresAt(startedAt, durationMinutes) : null,
+      durationMinutes,
+    }];
+  }));
+
   const locked = !!deadlineAt && Date.now() >= new Date(deadlineAt).getTime();
   return {
     stationOrder,
     stationStates,
+    blockStates,
+    quizTimer,
     quiz,
     beers,
     guinness,
@@ -62,5 +83,6 @@ export async function getTeamState(teamId: string) {
     finalStationTitle: rallyeConfig.finish.title,
     reviewUnlocked: stationStates.every((s) => s.submitted),
     scoring,
+    musicRoundSettings,
   };
 }
