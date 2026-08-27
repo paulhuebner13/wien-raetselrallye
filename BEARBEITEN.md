@@ -154,3 +154,7 @@ Im Admin unter **Fragenblock-Timer**:
 - **An:** Für jeden der 7 Blöcke kann separat eine Dauer in Minuten eingestellt werden. Erst mit **Los** startet der jeweilige Block.
 - Der Blockstart wird pro Team in Supabase gespeichert. Alle Geräte desselben Teams teilen sich denselben Timer.
 - Wird der Blocktimer ausgeschaltet, werden alte Blockzeiten ignoriert. Wird er später wieder aktiviert, starten die Blöcke für alle Teams neu.
+
+
+## Music Round – Hörstufen
+Standardmäßig sind die vier Hörstufen 1 / 2 / 5 / 15 Sekunden. Im Admin können alle vier Werte geändert und gespeichert werden. Die Team-App übernimmt die gespeicherten Werte serverseitig; der Button zeigt jeweils die aktuell freigegebene bzw. nächste Dauer an.

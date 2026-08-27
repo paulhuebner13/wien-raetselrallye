@@ -372,10 +372,10 @@ html, body { background: var(--bg); }
 
 /* Rallye-Pfad: einheitliche Quadrate und durchgehende Schlange */
 .path-wrap { --path-line: #8c725d; gap: 28px; padding-top: 14px; }
-.path-row { gap: 40px; min-height: 128px; }
+.path-row { --connector-offset: 10px; gap: 40px; min-height: 128px; }
 .path-row::before {
-  left: 25%;
-  right: 25%;
+  left: calc(25% - var(--connector-offset));
+  right: calc(25% - var(--connector-offset));
   top: 50%;
   border-top: 3px dashed var(--path-line);
 }
@@ -384,10 +384,10 @@ html, body { background: var(--bg); }
   bottom: auto;
   height: calc(100% + 28px);
   border-left: 3px dashed var(--path-line);
-  right: 25%;
+  right: calc(25% - var(--connector-offset));
 }
-.path-row:nth-child(even):not(:last-child)::after { right: 25%; left: auto; }
-.path-row:nth-child(odd):not(:last-child)::after { right: auto; left: 25%; }
+.path-row:nth-child(odd):not(:last-child)::after { right: calc(25% - var(--connector-offset)); left: auto; }
+.path-row:nth-child(even):not(:last-child)::after { right: auto; left: calc(25% - var(--connector-offset)); }
 .path-row.single::before { display: none; }
 .path-node {
   width: min(128px, calc((100vw - 96px) / 2));
@@ -400,7 +400,7 @@ html, body { background: var(--bg); }
 }
 .path-node.block { border-radius: 20px; }
 @media (max-width: 560px) {
-  .path-row { gap: 32px; min-height: 118px; }
+  .path-row { --connector-offset: 8px; gap: 32px; min-height: 118px; }
   .path-node { width: min(122px, calc((100vw - 88px) / 2)); font-size: 12px; }
   .path-wrap { gap: 26px; }
   .path-row:not(:last-child)::after { height: calc(100% + 26px); }

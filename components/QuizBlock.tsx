@@ -361,7 +361,7 @@ function MusicTrackCard({ track, index, answer, stage, durations, stagePoints, l
     />
     <div className="music-preview-controls">
       <button type="button" className="primary" onClick={() => playing ? stop() : play()}>{playing ? 'Stopp' : `${currentDuration}s anhören`}</button>
-      {stage < 4 && <button type="button" className="secondary" disabled={locked || revealing} onClick={more}>{revealing ? 'Öffnet…' : `Mehr hören · danach max. ${String(stagePoints[stage] ?? 0).replace('.', ',')} P.`}</button>}
+      {stage < 4 && <button type="button" className="secondary" disabled={locked || revealing} onClick={more}>{revealing ? 'Öffnet…' : `Mehr hören: ${durations[stage]}s · danach max. ${String(stagePoints[stage] ?? 0).replace('.', ',')} P.`}</button>}
     </div>
     <div className="music-progress" aria-hidden="true"><span style={{ width: `${Math.min(100, currentDuration > 0 ? (elapsed / currentDuration) * 100 : 0)}%` }} /></div>
     <input type="text" placeholder="Songtitel" value={answer} disabled={locked} onChange={(e) => onAnswer(e.target.value)} />

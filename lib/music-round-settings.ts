@@ -5,7 +5,7 @@ export type MusicRoundSettings = {
 };
 
 export function defaultMusicRoundSettings(): MusicRoundSettings {
-  return { stageDurationsSeconds: [2, 5, 10, 20] };
+  return { stageDurationsSeconds: [1, 2, 5, 15] };
 }
 
 export function normalizeMusicRoundSettings(value?: Partial<MusicRoundSettings> | null): MusicRoundSettings {

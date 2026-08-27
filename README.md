@@ -32,3 +32,7 @@ Jeder Fragenblock startet erst nach Klick auf **Los**. Standard: 5 Minuten. Der 
 Der Admin kann Blocktimer global deaktivieren oder aktivieren. Bei aktivem Timer ist die Dauer für jeden Fragenblock separat einstellbar; Start und Restzeit gelten teamweit über Supabase.
 
 - Music Round mit vier gestuften Songs; Hörlängen im Admin, Stufe pro Team gespeichert.
+
+
+## Music Round – Hörstufen
+Standardmäßig sind die vier Hörstufen 1 / 2 / 5 / 15 Sekunden. Im Admin können alle vier Werte geändert und gespeichert werden. Die Team-App übernimmt die gespeicherten Werte serverseitig; der Button zeigt jeweils die aktuell freigegebene bzw. nächste Dauer an.
