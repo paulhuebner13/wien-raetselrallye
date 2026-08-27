@@ -126,3 +126,9 @@ Datei:
 Hier stellst du die Punkte für normale Fragen, Stationsaufgaben sowie Guinness, Architektur und Wegbier ein.
 
 Picture Round und Music Round werden automatisch mit maximal 2 Punkten gewertet.
+
+## Bildformat der Stationshinweise
+
+Alle Hinweisbilder sind fest für Hochformat ausgelegt: **3:4 (Breite:Höhe)**. Verwende für alle Stationsbilder dasselbe Format, z. B. 1200 × 1600 px.
+
+Die Picture-Round-Bilder können in der Rallye angetippt und groß geöffnet werden.

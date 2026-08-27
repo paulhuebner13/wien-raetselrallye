@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Modal from '@/components/Modal';
 import { blockLabel, questionPoints } from '@/lib/config';
 import type { Question, QuestionBlock } from '@/lib/types';
 
@@ -88,6 +89,7 @@ function QuestionHeader({ question }: { question: Question }) {
 function QuestionCard({ question, serverValue, locked }: { question: Question; serverValue: string; locked: boolean }) {
   const autosave = useAutosave(question.id, serverValue, locked);
   const savedClass = autosave.status === 'saved' ? 'saved' : '';
+  const [preview, setPreview] = useState<{ src: string; index: number } | null>(null);
 
   if (question.type === 'picture_round') {
     const images = question.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.jpg`);
@@ -95,11 +97,15 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
     return <div className={`question-card ${savedClass}`}>
       <QuestionHeader question={question} />
       <div className="picture-round-grid">
-        {images.map((image, index) => <label className="picture-round-item" key={image}>
+        {images.map((image, index) => <div className="picture-round-item" key={image}>
           <span>{index + 1}</span>
-          <img src={image} alt={`Länderumriss ${index + 1}`} />
+          <button type="button" className="picture-round-zoom-button" onClick={() => setPreview({ src: image, index })} aria-label={`Bild ${index + 1} groß ansehen`}>
+            <img src={image} alt={`Länderumriss ${index + 1}`} />
+            <span className="zoom-hint">Vergrößern</span>
+          </button>
           <input
             type="text"
+            aria-label={`Land ${index + 1}`}
             placeholder="Land"
             value={values[index]}
             disabled={locked}
@@ -109,9 +115,15 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
               autosave.setValue(JSON.stringify(next));
             }}
           />
-        </label>)}
+        </div>)}
       </div>
       <SaveState status={autosave.status} />
+      {preview && <Modal wide onClose={() => setPreview(null)}>
+        <div className="picture-lightbox">
+          <div className="eyebrow">PICTURE ROUND · {preview.index + 1}</div>
+          <img src={preview.src} alt={`Länderumriss ${preview.index + 1} groß`} />
+        </div>
+      </Modal>}
     </div>;
   }
 

@@ -246,3 +246,80 @@ html, body { background: var(--bg); }
   .matching-row { grid-template-columns: minmax(0, 1fr) 96px; }
   .special-eval-grid, .music-admin-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* v6: Hochformat-Hinweise, Bildvorschau und eigene Bestätigungsdialoge */
+.station-image-wrap {
+  aspect-ratio: 3 / 4;
+  width: min(100%, 520px);
+  margin-inline: auto;
+  background: var(--brown-soft);
+}
+
+.confirm-dialog {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+.confirm-dialog h2 { margin: 0; padding-right: 38px; }
+.confirm-dialog p { margin: 0 0 6px; color: var(--muted); line-height: 1.4; }
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+.confirm-actions button { min-height: 48px; }
+
+.picture-round-zoom-button {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: inherit;
+  overflow: hidden;
+}
+.picture-round-zoom-button img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #fff;
+}
+.zoom-hint {
+  position: absolute !important;
+  left: auto !important;
+  top: auto !important;
+  right: 7px;
+  bottom: 7px;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0;
+  padding: 5px 7px;
+  border-radius: 8px !important;
+  background: rgba(23,18,14,.76) !important;
+  color: #fffaf1 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+.picture-lightbox {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+.picture-lightbox img {
+  display: block;
+  width: 100%;
+  max-height: 76vh;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fff;
+}
+
+@media (max-width: 480px) {
+  .confirm-actions { grid-template-columns: 1fr; }
+  .confirm-actions .primary { order: -1; }
+  .picture-lightbox img { max-height: 70vh; }
+}
