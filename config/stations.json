@@ -3,7 +3,7 @@
     "title": "Rätselrallye",
     "body": [
       "Sucht die Orte mittels der Hinweise und findet dort die Antworten auf die Fragen.",
-      "Die Hinweise zeigen den gesuchten Bereich. Gemeint ist nicht nur der exakte Aufnahmeort, sondern der größere, klar abgegrenzte Bereich.",
+      "Die Hinweise zeigen den gesuchten Bereich. Gemeint ist nicht nur der exakte Aufnahmeort oder das Motiv, sondern der größere, aber klar abgegrenzte Bereich.",
       "Bis zum Ablauf des Timers müsst ihr im Johnny's Pub sein. Danach sind keine Änderungen mehr möglich."
     ],
     "phoneRules": [
@@ -73,7 +73,7 @@
     {
       "id": 3,
       "title": "Station 3",
-      "text": "Amsterdam und Venedig sind berühmt dafür – aber wie viele davon lassen sich hier finden? (Ränder zählen nicht)",
+      "text": "Amsterdam und Venedig sind dafür berühmt – aber wie viele davon lassen sich hier (im Inneren) finden?",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
@@ -88,7 +88,7 @@
     {
       "id": 4,
       "title": "Station 4",
-      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "text": "Insgesamt sind es vier, doch einer ist stabiler als die anderen. Wie heißt er?",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
