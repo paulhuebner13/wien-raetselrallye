@@ -23,11 +23,20 @@ function defaultOrder() {
   return [...rallyeConfig.stations.filter((s) => s.id !== rallyeConfig.finalStationId).map((s) => s.id), rallyeConfig.finalStationId];
 }
 
+function validConfiguredOrder(order: number[] | null | undefined) {
+  if (!Array.isArray(order)) return false;
+  const ids = rallyeConfig.stations.map((s) => s.id);
+  return order.length === ids.length
+    && new Set(order).size === ids.length
+    && ids.every((id) => order.includes(id))
+    && order[order.length - 1] === rallyeConfig.finalStationId;
+}
+
 function toLocalInput(iso: string | null) {
   if (!iso) return '';
   const d = new Date(iso);
   const shifted = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-  return shifted.toISOString().slice(0, 16);
+  return shifted.toISOString().slice(0, 19);
 }
 
 function parseNames(raw: string) {
@@ -106,7 +115,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     if (!res.ok) return setError(data.error ?? 'Fehler.');
     setOverview(data);
     setDeadlineLocal(toLocalInput(data.deadlineAt));
-    setOrderInputs(Object.fromEntries((data.teams as Team[]).map((t) => [t.id, (t.station_order?.length ? t.station_order : defaultOrder()).join(', ')])));
+    setOrderInputs(Object.fromEntries((data.teams as Team[]).map((t) => [t.id, (validConfiguredOrder(t.station_order) ? t.station_order! : defaultOrder()).join(', ')])));
   }, [loggedIn]);
 
   useEffect(() => { load(); }, [load]);
@@ -202,8 +211,8 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
 
     <section className="admin-panel">
       <h2>Zeitlimit</h2>
-      <p className="muted">Danach sind Team-Änderungen gesperrt.</p>
-      <div className="admin-inline"><input type="datetime-local" value={deadlineLocal} onChange={(e) => setDeadlineLocal(e.target.value)} /><button className="primary" onClick={saveDeadline}>Speichern</button><button className="secondary" onClick={() => setDeadlineLocal('')}>Leeren</button></div>
+      <p className="muted">Beliebiger Zeitpunkt in Vergangenheit oder Zukunft. Ein neuer Zeitpunkt in der Zukunft entsperrt die Rallye wieder.</p>
+      <div className="admin-inline"><input type="datetime-local" step="1" value={deadlineLocal} onChange={(e) => setDeadlineLocal(e.target.value)} /><button className="primary" onClick={saveDeadline}>Speichern</button><button className="secondary" onClick={() => setDeadlineLocal('')}>Leeren</button></div>
     </section>
 
     <section className="admin-panel">

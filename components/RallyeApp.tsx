@@ -59,7 +59,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
   }, [router]);
 
   useEffect(() => { refresh(); }, [refresh]);
-  useEffect(() => { const id = setInterval(refresh, 5000); return () => clearInterval(id); }, [refresh]);
+  useEffect(() => { const id = setInterval(refresh, 2000); return () => clearInterval(id); }, [refresh]);
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
   useEffect(() => {
     if (sessionStorage.getItem('rallye-show-intro') === '1') {
@@ -98,22 +98,30 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
 
   const rows = useMemo<PathCell[][]>(() => {
     if (!state) return [];
-    const result: PathCell[][] = [];
-    for (let i = 0; i < mainNodes.length; i += 2) {
-      const pair: PathCell[] = mainNodes.slice(i, i + 2);
-      if ((i / 2) % 2 === 1) pair.reverse();
-      if (pair.length === 1) pair.push(null);
-      result.push(pair);
-    }
 
-    const review: PathNode = { key: 'review', kind: 'review', label: 'Antworten prüfen', state: state.reviewUnlocked ? 'open' : 'locked' };
-    if (result.length && result[result.length - 1][1] === null) result[result.length - 1][1] = review;
-    else result.push([null, review]);
+    // Der Pfad ist eine einzige Schlange: oben links → oben rechts →
+    // rechts darunter → links daneben → links darunter → rechts daneben …
+    // Antworten prüfen kommt nach allen normalen Stationen/Fragen, Johnny's Pub ganz zuletzt.
+    const sequence: PathNode[] = [...mainNodes];
+    sequence.push({ key: 'review', kind: 'review', label: 'Antworten prüfen', state: state.reviewUnlocked ? 'open' : 'locked' });
 
     if (finalStation) {
       const fs = state.stationStates.find((s) => s.stationId === finalStation.id)!;
-      const finalNode: PathNode = { key: `s-${finalStation.id}`, kind: 'station', label: finalStation.title, stationId: finalStation.id, state: fs.submitted ? 'done' : fs.unlocked ? 'open' : 'locked' };
-      result.push([finalNode, null]);
+      sequence.push({
+        key: `s-${finalStation.id}`,
+        kind: 'station',
+        label: finalStation.title,
+        stationId: finalStation.id,
+        state: fs.submitted ? 'done' : fs.unlocked ? 'open' : 'locked',
+      });
+    }
+
+    const result: PathCell[][] = [];
+    for (let i = 0; i < sequence.length; i += 2) {
+      const pair: PathCell[] = sequence.slice(i, i + 2);
+      if (pair.length === 1) pair.push(null);
+      if ((i / 2) % 2 === 1) pair.reverse();
+      result.push(pair);
     }
     return result;
   }, [state, mainNodes, finalStation]);

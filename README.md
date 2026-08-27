@@ -24,3 +24,7 @@ Einrichtung: siehe `SETUP.md`.
 - Regeln-Popup nur direkt nach Login; Info-Button öffnet es erneut
 - Admin-Auswertung mit manueller Gültigkeitsprüfung und Gesamtpunkten
 - Foto-Buttons der Team-Challenges öffnen auf Mobilgeräten die Kamera (`capture=environment`)
+
+## Inhalte bearbeiten
+
+Eine konkrete Übersicht für JPG-Stationsbilder, zusätzliche Stationen, Fragen und Kategorien steht in `BEARBEITEN.md`.
