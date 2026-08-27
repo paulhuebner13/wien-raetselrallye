@@ -92,7 +92,7 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
   const [preview, setPreview] = useState<{ src: string; index: number } | null>(null);
 
   if (question.type === 'picture_round') {
-    const images = question.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.jpg`);
+    const images = question.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.png`);
     const values = parseList(autosave.value, images.length);
     return <div className={`question-card ${savedClass}`}>
       <QuestionHeader question={question} />
@@ -100,13 +100,13 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
         {images.map((image, index) => <div className="picture-round-item" key={image}>
           <span>{index + 1}</span>
           <button type="button" className="picture-round-zoom-button" onClick={() => setPreview({ src: image, index })} aria-label={`Bild ${index + 1} groß ansehen`}>
-            <img src={image} alt={`Länderumriss ${index + 1}`} />
+            <img src={image} alt={`Picture-Round-Bild ${index + 1}`} />
             <span className="zoom-hint">Vergrößern</span>
           </button>
           <input
             type="text"
-            aria-label={`Land ${index + 1}`}
-            placeholder="Land"
+            aria-label={`Person ${index + 1}`}
+            placeholder="Person"
             value={values[index]}
             disabled={locked}
             onChange={(e) => {
@@ -121,7 +121,7 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
       {preview && <Modal wide onClose={() => setPreview(null)}>
         <div className="picture-lightbox">
           <div className="eyebrow">PICTURE ROUND · {preview.index + 1}</div>
-          <img src={preview.src} alt={`Länderumriss ${preview.index + 1} groß`} />
+          <img src={preview.src} alt={`Picture-Round-Bild ${preview.index + 1} groß`} />
         </div>
       </Modal>}
     </div>;

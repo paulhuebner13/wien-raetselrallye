@@ -2,7 +2,10 @@
   "blocks": [
     {
       "id": "block-1",
-      "categories": ["Picture Round", "Geographie"],
+      "categories": [
+        "Picture Round",
+        "Geographie"
+      ],
       "questions": [
         {
           "id": "picture-round",
@@ -20,76 +23,186 @@
             "/picture-round/8.png"
           ]
         },
-        {"id":"geo-neighbours","category":"Geographie","text":"Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."},
-        {"id":"geo-flags","category":"Geographie","text":"Welche Farbe kommt als einzige in den Flaggen von Brasilien, Sudan, Litauen und Aserbaidschan vor? Schwarz und Weiß zählen als Farben."}
+        {
+          "id": "geo-neighbours",
+          "category": "Geographie",
+          "text": "Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."
+        },
+        {
+          "id": "geo-flags",
+          "category": "Geographie",
+          "text": "Welche Farbe kommt als einzige in den Flaggen von Brasilien, Sudan, Litauen und Aserbaidschan vor? Schwarz und Weiß zählen als Farben."
+        }
       ]
     },
     {
       "id": "block-2",
-      "categories": ["Geschichte", "Politik", "Geschichte / Antike"],
+      "categories": [
+        "Geschichte",
+        "Politik",
+        "Geschichte / Antike"
+      ],
       "questions": [
-        {"id":"history-1","category":"Geschichte","text":"Geschichtsfrage 1 – hier ersetzen."},
-        {"id":"history-2","category":"Geschichte","text":"Geschichtsfrage 2 – hier ersetzen."},
-        {"id":"politics-1","category":"Politik","text":"Politikfrage 1 – hier ersetzen."},
-        {"id":"ancient-1","category":"Geschichte / Antike","text":"Antike-Frage – hier ersetzen."}
+        {
+          "id": "history-1",
+          "category": "Geschichte",
+          "text": "Geschichtsfrage 1 – hier ersetzen."
+        },
+        {
+          "id": "history-2",
+          "category": "Geschichte",
+          "text": "Geschichtsfrage 2 – hier ersetzen."
+        },
+        {
+          "id": "politics-1",
+          "category": "Politik",
+          "text": "Politikfrage 1 – hier ersetzen."
+        },
+        {
+          "id": "ancient-1",
+          "category": "Geschichte / Antike",
+          "text": "Antike-Frage – hier ersetzen."
+        }
       ]
     },
     {
       "id": "block-3",
-      "categories": ["Politik", "Sport", "Natur / Allgemeinwissen"],
+      "categories": [
+        "Politik",
+        "Sport",
+        "Natur / Allgemeinwissen"
+      ],
       "questions": [
-        {"id":"politics-2","category":"Politik","text":"Politikfrage 2 – hier ersetzen."},
         {
-          "id":"sport-founded",
-          "category":"Sport",
-          "text":"Ordnet diese Fußballclubs den Gründungsjahren zu. (1899, 1911, 1912, 1930)",
-          "type":"matching",
-          "items":["SV Ried","Austria Wien","Rapid Wien","WSG Tirol"],
-          "options":["1899","1911","1912","1930"]
+          "id": "politics-2",
+          "category": "Politik",
+          "text": "Politikfrage 2 – hier ersetzen."
         },
-        {"id":"nature-lizard","category":"Natur / Allgemeinwissen","text":"Welche ist die größte noch lebende Echse?"}
+        {
+          "id": "sport-founded",
+          "category": "Sport",
+          "text": "Ordnet diese Fußballclubs den Gründungsjahren zu. (1899, 1911, 1912, 1930)",
+          "type": "matching",
+          "items": [
+            "SV Ried",
+            "Austria Wien",
+            "Rapid Wien",
+            "WSG Tirol"
+          ],
+          "options": [
+            "1899",
+            "1911",
+            "1912",
+            "1930"
+          ]
+        },
+        {
+          "id": "nature-lizard",
+          "category": "Natur / Allgemeinwissen",
+          "text": "Welche ist die größte noch lebende Echse?"
+        }
       ]
     },
     {
       "id": "bonus",
-      "categories": ["Bonus / Schätzfrage"],
+      "categories": [
+        "Bonus / Schätzfrage"
+      ],
       "questions": [
-        {"id":"bonus-alcohol","category":"Bonus / Schätzfrage","text":"Wie viele Liter reinen Alkohol werden in Österreich durchschnittlich pro Person ab 15 Jahren und Jahr konsumiert?"}
+        {
+          "id": "bonus-alcohol",
+          "category": "Bonus / Schätzfrage",
+          "text": "Wie viele Liter reinen Alkohol werden in Österreich durchschnittlich pro Person ab 15 Jahren und Jahr konsumiert?"
+        }
       ]
     },
     {
       "id": "block-4",
-      "categories": ["Literatur", "Kunst", "Computer / Games"],
+      "categories": [
+        "Literatur",
+        "Kunst",
+        "Computer / Games"
+      ],
       "questions": [
-        {"id":"literature-1","category":"Literatur","text":"Literaturfrage – hier ersetzen."},
-        {"id":"art-1","category":"Kunst","text":"Kunstfrage – hier ersetzen."},
-        {"id":"games-1","category":"Computer / Games","text":"Games-Frage – hier ersetzen."}
+        {
+          "id": "literature-1",
+          "category": "Literatur",
+          "text": "Literaturfrage – hier ersetzen."
+        },
+        {
+          "id": "art-1",
+          "category": "Kunst",
+          "text": "Kunstfrage – hier ersetzen."
+        },
+        {
+          "id": "games-1",
+          "category": "Computer / Games",
+          "text": "Games-Frage – hier ersetzen."
+        }
       ]
     },
     {
       "id": "block-5",
-      "categories": ["Computer / Wissenschaft", "Serien / Film", "Film"],
+      "categories": [
+        "Computer / Wissenschaft",
+        "Serien / Film",
+        "Film"
+      ],
       "questions": [
-        {"id":"science-1","category":"Computer / Wissenschaft","text":"Computer-/Wissenschaftsfrage – hier ersetzen."},
-        {"id":"series-1","category":"Serien / Film","text":"Serien-/Filmfrage – hier ersetzen."},
-        {"id":"film-1","category":"Film","text":"Filmfrage – hier ersetzen."}
+        {
+          "id": "science-1",
+          "category": "Computer / Wissenschaft",
+          "text": "Computer-/Wissenschaftsfrage – hier ersetzen."
+        },
+        {
+          "id": "series-1",
+          "category": "Serien / Film",
+          "text": "Serien-/Filmfrage – hier ersetzen."
+        },
+        {
+          "id": "film-1",
+          "category": "Film",
+          "text": "Filmfrage – hier ersetzen."
+        }
       ]
     },
     {
       "id": "block-6",
-      "categories": ["Song / Musik", "Lyrics", "Music Round"],
+      "categories": [
+        "Song / Musik",
+        "Lyrics",
+        "Music Round"
+      ],
       "questions": [
-        {"id":"music-1","category":"Song / Musik","text":"Musikfrage 1 – hier ersetzen."},
-        {"id":"music-2","category":"Song / Musik","text":"Musikfrage 2 – hier ersetzen."},
-        {"id":"lyrics-1","category":"Lyrics","text":"Lyrics-Frage – hier ersetzen."},
         {
-          "id":"music-round",
-          "category":"Music Round",
-          "text":"Hört euch beide Songs an und tragt jeweils den Titel ein.",
-          "type":"music_round",
-          "tracks":[
-            {"label":"Song 1","src":"/music-round/1.mp3"},
-            {"label":"Song 2","src":"/music-round/2.mp3"}
+          "id": "music-1",
+          "category": "Song / Musik",
+          "text": "Musikfrage 1 – hier ersetzen."
+        },
+        {
+          "id": "music-2",
+          "category": "Song / Musik",
+          "text": "Musikfrage 2 – hier ersetzen."
+        },
+        {
+          "id": "lyrics-1",
+          "category": "Lyrics",
+          "text": "Lyrics-Frage – hier ersetzen."
+        },
+        {
+          "id": "music-round",
+          "category": "Music Round",
+          "text": "Hört euch beide Songs an und tragt jeweils den Titel ein.",
+          "type": "music_round",
+          "tracks": [
+            {
+              "label": "Song 1",
+              "src": "/music-round/1.mp3"
+            },
+            {
+              "label": "Song 2",
+              "src": "/music-round/2.mp3"
+            }
           ]
         }
       ]

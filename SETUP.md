@@ -99,7 +99,7 @@ Die Blöcke bleiben zusammen und werden automatisch möglichst gleichmäßig zwi
 
 ### Picture Round
 
-Die 8 Länderbilder liegen in GitHub unter `public/picture-round/1.jpg` bis `8.jpg`. Ersetze diese Dateien durch deine eigenen Länderumrisse.
+Die 8 Picture-Round-Bilder liegen in GitHub unter `public/picture-round/1.png` bis `8.png`. Ersetze diese Dateien durch deine eigenen Picture-Round-Bilder.
 
 ### Music Round
 
@@ -122,7 +122,7 @@ Beispiel:
 {
   "stationTaskPoints": { "1": 5, "2": 5, "3": 5, "4": 5 },
   "questionPoints": { "geo-neighbours": 2 },
-  "guinnessPerLogo": 1,
+  "guinnessPerLogo": 3,
   "architecturePerStyle": 1,
   "beerPerUniqueCan": 1
 }

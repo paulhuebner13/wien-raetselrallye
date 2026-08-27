@@ -208,7 +208,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
 
   function renderQuestionEvaluation(teamId: string, q: Question, rawAnswer: string | undefined) {
     if (q.type === 'picture_round') {
-      const images = q.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.jpg`);
+      const images = q.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.png`);
       const values = parseList(rawAnswer, images.length);
       const correct = images.filter((_, i) => evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)).length;
       const points = correct === 8 ? 2 : correct > 4 ? 1 : 0;
@@ -277,7 +277,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
       {drawResult && <div className="draw-result">{drawResult.map((members, i) => <article className="admin-card" key={i}><b>Team {String.fromCharCode(65 + i)}</b>{members.map((m) => <span key={m}>{m}</span>)}</article>)}</div>}
     </section>
 
-    <section className="admin-panel"><h2>Quiz-Dateien</h2><p className="muted">Picture Round: <code>public/picture-round/1.jpg</code> bis <code>8.jpg</code>. Music Round: <code>public/music-round/1.mp3</code> und <code>2.mp3</code>.</p></section>
+    <section className="admin-panel"><h2>Quiz-Dateien</h2><p className="muted">Picture Round: <code>public/picture-round/1.png</code> bis <code>8.png</code>. Music Round: <code>public/music-round/1.mp3</code> und <code>2.mp3</code>.</p></section>
 
     <section className="admin-panel"><h2>Punkte</h2><p className="muted">Bearbeiten in <code>config/scoring.json</code>.</p><div className="score-summary"><span>Standardfrage: <b>{scoringConfig.questionDefault}</b></span><span>Picture Round: <b>0/1/2</b></span><span>Music Round: <b>0/1/2</b></span><span>Guinness: <b>{scoringConfig.guinnessPerLogo}/Logo</b></span><span>Architektur: <b>{scoringConfig.architecturePerStyle}/Stil</b></span><span>Wegbier: <b>{scoringConfig.beerPerUniqueCan}/Bier</b></span></div></section>
 

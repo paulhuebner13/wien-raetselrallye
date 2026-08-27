@@ -20,23 +20,23 @@
   "architectureStyles": [
     {
       "name": "Gotik",
-      "description": "Typisch sind Spitzbögen, Kreuzrippengewölbe und Strebewerk. Große Fensterflächen und hohe, stark vertikale Proportionen lassen die Gebäude aufwärtsstrebend wirken."
+      "description": "Die Gotik entwickelte sich ab der Mitte des 12. Jahrhunderts in Frankreich und prägte die europäische Architektur bis in die frühe Neuzeit. Typisch sind Spitzbögen, Kreuzrippengewölbe, Strebepfeiler und große Fensterflächen. Die Konstruktion verlagert tragende Kräfte stärker nach außen, wodurch hohe, lichtreiche Innenräume und eine starke Betonung der Vertikalen möglich werden. Erkennen kann man gotische Bauten besonders an Spitzbögen, Maßwerk und dem aufwärtsstrebenden Eindruck; gegenüber der Romanik wirken sie meist leichter und stärker durchfenstert."
     },
     {
       "name": "Barock",
-      "description": "Barocke Fassaden wirken repräsentativ und sind oft reich geschmückt. Häufig sind Säulen oder Pilaster, Giebel, Kuppeln und bewegte, geschwungene Formen; die Mitte der Fassade wird oft besonders betont."
+      "description": "Die Barockarchitektur entstand im 17. Jahrhundert in Italien und verbreitete sich anschließend in weiten Teilen Europas. Typisch sind reich geschmückte Fassaden, Säulen und Pilaster, Giebel, Kuppeln sowie eine starke Betonung der Gebäudemitte. Im Verlauf des Barock wurden Formen häufig bewegter und geschwungener, etwa durch konkave und konvexe Fassadenteile, während Licht und Dekoration gezielt für eine repräsentative Wirkung eingesetzt wurden. Erkennen kann man Barock daher an seiner Pracht, Bewegung und starken Inszenierung; gegenüber dem Klassizismus wirkt er meist verspielter und weniger streng."
     },
     {
       "name": "Jugendstil",
-      "description": "Typisch sind dekorativ geschwungene Linien und florale Ornamente; in Wien treten oft auch geometrische und reduzierte Formen auf. Der Jugendstil wollte sich bewusst von der Nachahmung älterer historischer Stile lösen."
+      "description": "Der Jugendstil entstand gegen Ende des 19. Jahrhunderts und war ungefähr von den 1890er-Jahren bis um 1910 besonders prägend. Kennzeichnend sind dekorativ geschwungene Linien und florale Ornamente, in Wien aber auch geometrische, reduzierte und modernere Formen. Ein zentrales Ziel war die Abkehr vom Historismus, also von der bloßen Nachahmung älterer Baustile, und die Suche nach einer eigenen Formensprache der Gegenwart. Erkennen kann man Jugendstil häufig an Pflanzenmotiven, ornamentalen Fassaden, charakteristischen Schrift- und Metallarbeiten oder klaren geometrischen Dekorationen."
     },
     {
       "name": "Klassizismus",
-      "description": "Der Klassizismus orientiert sich an der griechischen und römischen Antike, besonders am Tempelbau. Typisch sind klare Symmetrie, Säulen, Dreiecksgiebel und eher geradlinige, ruhige Formen."
+      "description": "Der Klassizismus prägte die Architektur vor allem vom späten 18. bis in die erste Hälfte des 19. Jahrhunderts und orientierte sich bewusst an der griechischen und römischen Antike. Häufig verwendet werden Säulenordnungen, Portiken, Dreiecksgiebel und andere Formen, die an antike Tempel erinnern. Die Gestaltung wirkt meist klar, ruhig, ausgewogen und deutlich weniger verspielt als im Barock. Erkennen kann man klassizistische Gebäude daher besonders an ihrer antiken Formensprache, regelmäßigen Gliederung und zurückhaltenden Dekoration."
     },
     {
       "name": "Historismus",
-      "description": "Der Historismus des 19. Jahrhunderts greift bewusst auf ältere Baustile zurück. Gebäude können etwa neugotisch, neorenaissancehaft oder neobarock gestaltet sein; teilweise werden mehrere historische Stilformen miteinander gemischt."
+      "description": "Der Historismus war vor allem in der zweiten Hälfte des 19. Jahrhunderts bis zum frühen 20. Jahrhundert verbreitet und griff bewusst auf Baustile früherer Epochen zurück. Dazu gehören etwa Neogotik, Neorenaissance und Neobarock, wobei manchmal auch mehrere historische Stile in einem Gebäude kombiniert wurden. Deshalb besitzt der Historismus keine einzige typische Formensprache, sondern erkennt sich vor allem an der bewussten Wiederaufnahme älterer Architekturformen. Vom Jugendstil unterscheidet er sich gerade dadurch, dass er historische Vorbilder zitiert, während der Jugendstil eine neue, zeitgemäße Gestaltung suchte."
     }
   ],
   "stations": [

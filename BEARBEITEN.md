@@ -79,11 +79,11 @@ Die Namen auf den Kacheln kommen aus `categories` des jeweiligen Blocks:
 
 Die 8 Bilder liegen direkt im Projekt:
 
-- `public/picture-round/1.jpg`
+- `public/picture-round/1.png`
 - ...
-- `public/picture-round/8.jpg`
+- `public/picture-round/8.png`
 
-Einfach durch deine Länderumrisse ersetzen und auf GitHub pushen.
+Einfach durch deine Picture-Round-Bilder ersetzen und auf GitHub pushen.
 
 Im Admin kannst du für jedes der 8 Bilder einzeln **Richtig** anhaken.
 
