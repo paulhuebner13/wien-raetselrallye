@@ -16,3 +16,9 @@ Wichtigste Dateien:
 - `public/music-round/` – 2 MP3-Dateien
 
 Johnny's Pub ist nur der Endpunkt der Karte und keine Station mit Hinweisen.
+
+## Admin: Punkte und Auslosung
+
+- Punkte können direkt im Admin geändert werden; die gespeicherten Werte liegen in `app_settings` in Supabase und gelten auch in der Team-App.
+- Die Team-Auslosung speichert Spielerliste, Teamanzahl, Zusammen-/Getrennt-Regeln und das letzte Ergebnis automatisch.
+- Die Auswertung zeigt Teams nebeneinander und wertet Picture Round standardmäßig mit 0 Punkten bei 0–3, 1 Punkt bei 4–7 und 2 Punkten bei 8/8.

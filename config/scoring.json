@@ -31,6 +31,10 @@
     "lyrics-1": 1,
     "music-round": 2
   },
+  "pictureRoundPartialThreshold": 4,
+  "pictureRoundPartialPoints": 1,
+  "pictureRoundFullPoints": 2,
+  "musicRoundPerCorrect": 1,
   "guinnessPerLogo": 3,
   "architecturePerStyle": 1,
   "beerPerUniqueCan": 1

@@ -2,16 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Modal from '@/components/Modal';
-import { blockLabel, questionPoints } from '@/lib/config';
-import type { Question, QuestionBlock } from '@/lib/types';
+import { blockLabel, questionMaxPoints } from '@/lib/config';
+import type { Question, QuestionBlock, ScoringConfig } from '@/lib/types';
 
-export default function QuizBlock({ block, answers, onClose, allBlocks, review = false, locked = false }: {
+export default function QuizBlock({ block, answers, onClose, allBlocks, review = false, locked = false, scoring }: {
   block?: QuestionBlock;
   answers: Record<string, string>;
   onClose: () => void;
   allBlocks?: QuestionBlock[];
   review?: boolean;
   locked?: boolean;
+  scoring: ScoringConfig;
 }) {
   const blocks = review ? (allBlocks ?? []) : (block ? [block] : []);
   return <div className="sheet-page">
@@ -25,7 +26,7 @@ export default function QuizBlock({ block, answers, onClose, allBlocks, review =
     </div>
     {blocks.map((b) => <section key={b.id} className="question-section">
       {review && <h3>{blockLabel(b)}</h3>}
-      {b.questions.map((q) => <QuestionCard key={q.id} question={q} serverValue={answers[q.id] ?? ''} locked={locked} />)}
+      {b.questions.map((q) => <QuestionCard key={q.id} question={q} serverValue={answers[q.id] ?? ''} locked={locked} scoring={scoring} />)}
     </section>)}
   </div>;
 }
@@ -79,14 +80,14 @@ function SaveState({ status }: { status: 'idle' | 'saving' | 'saved' | 'error' }
   return <span className="save-state">{status === 'saving' ? 'Speichert…' : status === 'saved' ? 'Gespeichert' : status === 'error' ? 'Fehler' : ''}</span>;
 }
 
-function QuestionHeader({ question }: { question: Question }) {
+function QuestionHeader({ question, scoring }: { question: Question; scoring: ScoringConfig }) {
   return <>
-    <span className="question-meta"><span className="category">{question.category}</span><span>{questionPoints(question.id)} P.</span></span>
+    <span className="question-meta"><span className="category">{question.category}</span><span>{questionMaxPoints(question.id, scoring)} P.</span></span>
     <span className="question-text">{question.text}</span>
   </>;
 }
 
-function QuestionCard({ question, serverValue, locked }: { question: Question; serverValue: string; locked: boolean }) {
+function QuestionCard({ question, serverValue, locked, scoring }: { question: Question; serverValue: string; locked: boolean; scoring: ScoringConfig }) {
   const autosave = useAutosave(question.id, serverValue, locked);
   const savedClass = autosave.status === 'saved' ? 'saved' : '';
   const [preview, setPreview] = useState<{ src: string; index: number } | null>(null);
@@ -95,7 +96,7 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
     const images = question.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.png`);
     const values = parseList(autosave.value, images.length);
     return <div className={`question-card ${savedClass}`}>
-      <QuestionHeader question={question} />
+      <QuestionHeader question={question} scoring={scoring} />
       <div className="picture-round-grid">
         {images.map((image, index) => <div className="picture-round-item" key={image}>
           <span>{index + 1}</span>
@@ -131,7 +132,7 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
     const items = question.items ?? [];
     const values = parseMap(autosave.value);
     return <div className={`question-card ${savedClass}`}>
-      <QuestionHeader question={question} />
+      <QuestionHeader question={question} scoring={scoring} />
       <div className="matching-grid">
         {items.map((item) => <label className="matching-row" key={item}>
           <span>{item}</span>
@@ -153,7 +154,7 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
     const tracks = question.tracks ?? [];
     const values = parseList(autosave.value, tracks.length);
     return <div className={`question-card ${savedClass}`}>
-      <QuestionHeader question={question} />
+      <QuestionHeader question={question} scoring={scoring} />
       <div className="music-round-list">
         {tracks.map((track, index) => <label className="music-round-item" key={track.src}>
           <b>{track.label}</b>
@@ -176,7 +177,7 @@ function QuestionCard({ question, serverValue, locked }: { question: Question; s
   }
 
   return <label className={`question-card ${savedClass}`}>
-    <QuestionHeader question={question} />
+    <QuestionHeader question={question} scoring={scoring} />
     <textarea rows={question.type === 'textarea' ? 5 : 2} value={autosave.value} onChange={(e) => autosave.setValue(e.target.value)} disabled={locked} />
     <SaveState status={autosave.status} />
   </label>;

@@ -49,6 +49,10 @@ export type ScoringConfig = {
   stationTaskPoints: Record<string, number>;
   questionDefault: number;
   questionPoints: Record<string, number>;
+  pictureRoundPartialThreshold: number;
+  pictureRoundPartialPoints: number;
+  pictureRoundFullPoints: number;
+  musicRoundPerCorrect: number;
   guinnessPerLogo: number;
   architecturePerStyle: number;
   beerPerUniqueCan: number;

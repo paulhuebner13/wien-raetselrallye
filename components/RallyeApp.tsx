@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Question, QuestionBlock, RallyeConfig } from '@/lib/types';
+import type { Question, QuestionBlock, RallyeConfig, ScoringConfig } from '@/lib/types';
 import { blockLabel, distributeBlocks } from '@/lib/config';
 import IntroModal from './IntroModal';
 import StationView from './StationView';
@@ -21,6 +21,7 @@ type TeamState = {
   locked: boolean;
   finalStationTitle: string;
   reviewUnlocked: boolean;
+  scoring: ScoringConfig;
 };
 
 type OpenItem = { type: 'station'; id: number } | { type: 'block'; id: string } | { type: 'review' } | null;
@@ -168,9 +169,9 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
             : <div className="path-placeholder" key={`empty-${cellIndex}`} />)}
         </div>;
       })}</section>}
-      {tab === 'guinness' && <GuinnessTab entries={state.guinness} refresh={refresh} locked={localLocked} />}
-      {tab === 'architecture' && <ArchitectureTab entries={state.architecture} styles={config.architectureStyles} refresh={refresh} locked={localLocked} />}
-      {tab === 'beer' && <BeerTab beers={state.beers} refresh={refresh} locked={localLocked} />}
+      {tab === 'guinness' && <GuinnessTab entries={state.guinness} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
+      {tab === 'architecture' && <ArchitectureTab entries={state.architecture} styles={config.architectureStyles} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
+      {tab === 'beer' && <BeerTab beers={state.beers} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
     </div>
 
     <nav className="bottom-nav">
@@ -182,7 +183,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
 
     {showIntro && <IntroModal config={config} onClose={() => setShowIntro(false)} />}
     {openStation && openStationState && <div className="full-sheet"><StationView station={openStation} state={openStationState} onClose={() => setOpen(null)} refresh={refresh} locked={localLocked} /></div>}
-    {openBlock && <div className="full-sheet"><QuizBlock block={openBlock} answers={state.quiz} locked={localLocked} onClose={() => setOpen(null)} /></div>}
-    {open?.type === 'review' && <div className="full-sheet"><QuizBlock review allBlocks={blocks} answers={state.quiz} locked={localLocked} onClose={() => setOpen(null)} /></div>}
+    {openBlock && <div className="full-sheet"><QuizBlock block={openBlock} answers={state.quiz} locked={localLocked} scoring={state.scoring} onClose={() => setOpen(null)} /></div>}
+    {open?.type === 'review' && <div className="full-sheet"><QuizBlock review allBlocks={blocks} answers={state.quiz} locked={localLocked} scoring={state.scoring} onClose={() => setOpen(null)} /></div>}
   </main>;
 }

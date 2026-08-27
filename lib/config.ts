@@ -33,10 +33,26 @@ export function blockLabel(block: QuestionBlock) {
   return `Fragen · ${names.join(' / ')}`;
 }
 
-export function questionPoints(questionId: string) {
-  return scoringConfig.questionPoints[questionId] ?? scoringConfig.questionDefault;
+export function mergeScoringConfig(overrides?: Partial<ScoringConfig> | null): ScoringConfig {
+  const source = overrides ?? {};
+  return {
+    ...scoringConfig,
+    ...source,
+    stationTaskPoints: { ...scoringConfig.stationTaskPoints, ...(source.stationTaskPoints ?? {}) },
+    questionPoints: { ...scoringConfig.questionPoints, ...(source.questionPoints ?? {}) },
+  };
 }
 
-export function stationTaskPoints(stationId: number) {
-  return scoringConfig.stationTaskPoints[String(stationId)] ?? scoringConfig.stationTaskDefault;
+export function questionPoints(questionId: string, config: ScoringConfig = scoringConfig) {
+  return config.questionPoints[questionId] ?? config.questionDefault;
+}
+
+export function stationTaskPoints(stationId: number, config: ScoringConfig = scoringConfig) {
+  return config.stationTaskPoints[String(stationId)] ?? config.stationTaskDefault;
+}
+
+export function questionMaxPoints(questionId: string, config: ScoringConfig = scoringConfig) {
+  if (questionId === 'picture-round') return config.pictureRoundFullPoints;
+  if (questionId === 'music-round') return config.musicRoundPerCorrect * 2;
+  return questionPoints(questionId, config);
 }

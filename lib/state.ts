@@ -1,11 +1,12 @@
 import { supabaseAdmin } from './supabase-admin';
 import { rallyeConfig } from './config';
+import { getScoringConfig } from './scoring-settings';
 import { getDeadlineAt } from './deadline';
 import { getTeamStationOrder } from './team-order';
 
 export async function getTeamState(teamId: string) {
   const db = supabaseAdmin();
-  const [progressRes, quizRes, beerRes, guinnessRes, architectureRes, deadlineAt, stationOrder] = await Promise.all([
+  const [progressRes, quizRes, beerRes, guinnessRes, architectureRes, deadlineAt, stationOrder, scoring] = await Promise.all([
     db.from('station_progress').select('*').eq('team_id', teamId),
     db.from('quiz_answers').select('*').eq('team_id', teamId),
     db.from('beers').select('*').eq('team_id', teamId).order('brand'),
@@ -13,6 +14,7 @@ export async function getTeamState(teamId: string) {
     db.from('architecture_entries').select('*').eq('team_id', teamId).order('created_at'),
     getDeadlineAt(),
     getTeamStationOrder(teamId),
+    getScoringConfig(),
   ]);
 
   for (const result of [progressRes, quizRes, beerRes, guinnessRes, architectureRes]) {
@@ -40,7 +42,7 @@ export async function getTeamState(teamId: string) {
       unlocked: previous,
       submitted: !!row?.submitted_at,
       hintsUsed: row?.hints_used ?? 0,
-      hintPoints: Math.max(0, 5 - (row?.hints_used ?? 0)),
+      hintPoints: Math.max(0, scoring.hintPointsMax - (row?.hints_used ?? 0)),
       answer: row?.answer ?? '',
       submittedAt: row?.submitted_at ?? null,
       scorePercent: row?.score_percent ?? null,
@@ -59,5 +61,6 @@ export async function getTeamState(teamId: string) {
     locked,
     finalStationTitle: rallyeConfig.finish.title,
     reviewUnlocked: stationStates.every((s) => s.submitted),
+    scoring,
   };
 }

@@ -132,3 +132,22 @@ Picture Round und Music Round werden automatisch mit maximal 2 Punkten gewertet.
 Alle Hinweisbilder sind fest für Hochformat ausgelegt: **3:4 (Breite:Höhe)**. Verwende für alle Stationsbilder dasselbe Format, z. B. 1200 × 1600 px.
 
 Die Picture-Round-Bilder können in der Rallye angetippt und groß geöffnet werden.
+
+
+## Punkte im Admin
+
+Die Punkte werden im Admin unter **Punkte** geändert und in Supabase gespeichert. Dort kannst du Stationspunkte, Punkte pro normaler Quizfrage, Guinness, Architektur, Wegbier sowie Picture- und Music-Round-Werte ändern. `config/scoring.json` bleibt der Standardwert für ein neues Projekt; gespeicherte Admin-Werte haben Vorrang.
+
+## Team-Auslosung speichern
+
+Die Spielerliste, Teamanzahl, Zusammen-/Getrennt-Paare und das zuletzt generierte Ergebnis werden automatisch in Supabase gespeichert. Nach einem Reload des Admin-Tabs sind sie wieder da.
+
+## Picture-Round-Wertung
+
+Standardmäßig gilt:
+
+- 0–3 richtig = 0 Punkte
+- 4–7 richtig = 1 Punkt
+- 8/8 richtig = 2 Punkte
+
+Schwelle und Punkte kannst du im Admin ändern.

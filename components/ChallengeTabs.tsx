@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { RallyeConfig } from '@/lib/types';
-import { scoringConfig } from '@/lib/config';
+import type { RallyeConfig, ScoringConfig } from '@/lib/types';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 
 type GuinnessEntry = { id: string; street: string; image_url: string | null };
@@ -21,7 +20,7 @@ async function signedUpload(kind: 'guinness' | 'architecture' | 'beer', file: Fi
   return ticket.path as string;
 }
 
-export function GuinnessTab({ entries, refresh, locked }: { entries: GuinnessEntry[]; refresh: () => Promise<void>; locked: boolean }) {
+export function GuinnessTab({ entries, refresh, locked, scoring }: { entries: GuinnessEntry[]; refresh: () => Promise<void>; locked: boolean; scoring: ScoringConfig }) {
   const [file, setFile] = useState<File | null>(null);
   const [street, setStreet] = useState('');
   const [busy, setBusy] = useState(false);
@@ -54,11 +53,11 @@ export function GuinnessTab({ entries, refresh, locked }: { entries: GuinnessEnt
   }
 
   return <section className="tab-page">
-    <div className="tab-score-row"><span className="count-badge">{entries.length * scoringConfig.guinnessPerLogo} P.</span></div>
+    <div className="tab-score-row"><span className="count-badge">{entries.length * scoring.guinnessPerLogo} P.</span></div>
     <div className="rule-box">
       <b>Regeln</b>
       <p>Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren. Harfe + Guinness-Schriftzug müssen sichtbar sein.</p>
-      <p>Jedes gültige Foto: {scoringConfig.guinnessPerLogo} Punkt{scoringConfig.guinnessPerLogo === 1 ? '' : 'e'}.</p>
+      <p>Jedes gültige Foto: {scoring.guinnessPerLogo} Punkt{scoring.guinnessPerLogo === 1 ? '' : 'e'}.</p>
     </div>
     {!locked && <form className="upload-form" onSubmit={add}>
       <label className="file-button">Foto machen<input id="guinness-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
@@ -75,9 +74,9 @@ export function GuinnessTab({ entries, refresh, locked }: { entries: GuinnessEnt
   </section>;
 }
 
-export function ArchitectureTab({ entries, styles, refresh, locked }: { entries: ArchitectureEntry[]; styles: RallyeConfig['architectureStyles']; refresh: () => Promise<void>; locked: boolean }) {
+export function ArchitectureTab({ entries, styles, refresh, locked, scoring }: { entries: ArchitectureEntry[]; styles: RallyeConfig['architectureStyles']; refresh: () => Promise<void>; locked: boolean; scoring: ScoringConfig }) {
   return <section className="tab-page">
-    <div className="tab-score-row"><span className="count-badge">{entries.length * scoringConfig.architecturePerStyle} P.</span></div>
+    <div className="tab-score-row"><span className="count-badge">{entries.length * scoring.architecturePerStyle} P.</span></div>
     <div className="rule-box"><b>Regeln</b><p>Je ein Gebäude pro Stil direkt in der App fotografieren. Gebäudename eintragen und hochladen.</p></div>
     <div className="style-list">{styles.map((style) => {
       const entry = entries.find((e) => e.style === style.name);
@@ -129,7 +128,7 @@ function ArchitectureStyle({ style, entry, refresh, locked }: { style: RallyeCon
   </article>;
 }
 
-export function BeerTab({ beers, refresh, locked }: { beers: Beer[]; refresh: () => Promise<void>; locked: boolean }) {
+export function BeerTab({ beers, refresh, locked, scoring }: { beers: Beer[]; refresh: () => Promise<void>; locked: boolean; scoring: ScoringConfig }) {
   const [brand, setBrand] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -160,10 +159,10 @@ export function BeerTab({ beers, refresh, locked }: { beers: Beer[]; refresh: ()
   }
 
   return <section className="tab-page">
-    <div className="tab-score-row"><span className="count-badge">{beers.length * scoringConfig.beerPerUniqueCan} P.</span></div>
+    <div className="tab-score-row"><span className="count-badge">{beers.length * scoring.beerPerUniqueCan} P.</span></div>
     <div className="rule-box">
       <b>Regeln</b>
-      <p>{scoringConfig.beerPerUniqueCan} Punkt pro unterschiedlichem Dosenbier. Kein Radler, Cider oder alkoholfreies Bier.</p>
+      <p>{scoring.beerPerUniqueCan} Punkt pro unterschiedlichem Dosenbier. Kein Radler, Cider oder alkoholfreies Bier.</p>
       <p>Sorten zählen getrennt: z. B. Stiegl Goldbräu und Stiegl Hell. 0,33 l und 0,5 l derselben Sorte zählen nicht doppelt.</p>
     </div>
     {!locked && <form className="upload-form" onSubmit={add}>
