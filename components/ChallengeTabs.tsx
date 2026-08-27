@@ -31,10 +31,12 @@ export function GuinnessTab({ entries, refresh, locked, scoring }: { entries: Gu
     if (locked) return setError('Zeit abgelaufen.');
     if (!file || !street.trim()) return setError('Foto und Straße angeben.');
     if (file.size > 20 * 1024 * 1024) return setError('Foto ist größer als 20 MB.');
+    const streetToSave = street.trim();
+    const fileToSave = file;
     setBusy(true); setError('');
     try {
-      const path = await signedUpload('guinness', file, { street });
-      const saveRes = await fetch('/api/team/guinness', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, street }) });
+      const path = await signedUpload('guinness', fileToSave, { street: streetToSave });
+      const saveRes = await fetch('/api/team/guinness', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, street: streetToSave }) });
       const save = await saveRes.json();
       if (!saveRes.ok) throw new Error(save.error ?? 'Speichern fehlgeschlagen.');
       setFile(null); setStreet('');
@@ -60,9 +62,9 @@ export function GuinnessTab({ entries, refresh, locked, scoring }: { entries: Gu
       <p>Jedes gültige Foto: {scoring.guinnessPerLogo} Punkt{scoring.guinnessPerLogo === 1 ? '' : 'e'}.</p>
     </div>
     {!locked && <form className="upload-form" onSubmit={add}>
-      <label className="file-button">Foto machen<input id="guinness-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input id="guinness-file" type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
-      <label>Straße<input value={street} onChange={(e) => setStreet(e.target.value)} /></label>
+      <label>Straße<input value={street} disabled={busy} onChange={(e) => setStreet(e.target.value)} /></label>
       <button className="primary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
       {error && <p className="error-text">{error}</p>}
     </form>}
@@ -96,10 +98,12 @@ function ArchitectureStyle({ style, entry, refresh, locked }: { style: RallyeCon
     if (locked) return setError('Zeit abgelaufen.');
     if (!file || !name.trim()) return setError('Foto und Gebäudename angeben.');
     if (file.size > 20 * 1024 * 1024) return setError('Foto ist größer als 20 MB.');
+    const nameToSave = name.trim();
+    const fileToSave = file;
     setBusy(true); setError('');
     try {
-      const path = await signedUpload('architecture', file, { style: style.name, buildingName: name });
-      const saveRes = await fetch('/api/team/architecture', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, style: style.name, buildingName: name }) });
+      const path = await signedUpload('architecture', fileToSave, { style: style.name, buildingName: nameToSave });
+      const saveRes = await fetch('/api/team/architecture', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, style: style.name, buildingName: nameToSave }) });
       const save = await saveRes.json();
       if (!saveRes.ok) throw new Error(save.error ?? 'Speichern fehlgeschlagen.');
       setFile(null); setName(''); await refresh();
@@ -119,9 +123,9 @@ function ArchitectureStyle({ style, entry, refresh, locked }: { style: RallyeCon
       {entry.image_url && <img className="style-image" src={entry.image_url} alt={style.name} />}
       <div className="entry-row"><b>{entry.building_name}</b>{!locked && <button className="danger-link" onClick={remove}>Löschen</button>}</div>
     </> : !locked ? <form className="upload-form compact" onSubmit={add}>
-      <label className="file-button">Foto machen<input type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
-      <label>Gebäudename<input value={name} onChange={(e) => setName(e.target.value)} /></label>
+      <label>Gebäudename<input value={name} disabled={busy} onChange={(e) => setName(e.target.value)} /></label>
       <button className="secondary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
       {error && <p className="error-text">{error}</p>}
     </form> : <div className="locked-notice">Zeit abgelaufen.</div>}
@@ -139,10 +143,12 @@ export function BeerTab({ beers, refresh, locked, scoring }: { beers: Beer[]; re
     if (locked) return setError('Zeit abgelaufen.');
     if (!brand.trim() || !file) return setError('Bier und Foto angeben.');
     if (file.size > 20 * 1024 * 1024) return setError('Foto ist größer als 20 MB.');
+    const brandToSave = brand.trim();
+    const fileToSave = file;
     setBusy(true);
     try {
-      const path = await signedUpload('beer', file, { brand });
-      const res = await fetch('/api/team/beer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brand, path }) });
+      const path = await signedUpload('beer', fileToSave, { brand: brandToSave });
+      const res = await fetch('/api/team/beer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brand: brandToSave, path }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Fehler.');
       setBrand(''); setFile(null);
@@ -166,9 +172,9 @@ export function BeerTab({ beers, refresh, locked, scoring }: { beers: Beer[]; re
       <p>Sorten zählen getrennt: z. B. Stiegl Goldbräu und Stiegl Hell. 0,33 l und 0,5 l derselben Sorte zählen nicht doppelt.</p>
     </div>
     {!locked && <form className="upload-form" onSubmit={add}>
-      <label className="file-button">Foto machen<input id="beer-file" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
+      <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input id="beer-file" type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
-      <label>Bier<input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="z. B. Stiegl Goldbräu" /></label>
+      <label>Bier<input value={brand} disabled={busy} onChange={(e) => setBrand(e.target.value)} placeholder="z. B. Stiegl Goldbräu" /></label>
       <button className="primary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
       {error && <p className="error-text">{error}</p>}
     </form>}

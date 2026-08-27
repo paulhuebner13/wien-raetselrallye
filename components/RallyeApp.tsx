@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { QuestionBlock, RallyeConfig, ScoringConfig } from '@/lib/types';
 import type { MusicRoundSettings } from '@/lib/music-round-settings';
@@ -56,12 +56,17 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
   const [open, setOpen] = useState<OpenItem>(null);
   const [error, setError] = useState('');
   const [now, setNow] = useState(Date.now());
+  const refreshSequence = useRef(0);
+  const appliedRefreshSequence = useRef(0);
 
   const refresh = useCallback(async () => {
+    const sequence = ++refreshSequence.current;
     const res = await fetch('/api/team/state', { cache: 'no-store' });
     if (res.status === 401) { router.push('/'); return; }
     const data = await res.json();
     if (!res.ok) return setError(data.error ?? 'Fehler beim Laden.');
+    if (sequence < appliedRefreshSequence.current) return;
+    appliedRefreshSequence.current = sequence;
     setState(data);
   }, [router]);
 

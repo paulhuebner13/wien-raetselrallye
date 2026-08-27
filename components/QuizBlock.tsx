@@ -109,30 +109,84 @@ export default function QuizBlock({ block, blockState, answers, onClose, onStart
 function useAutosave(questionId: string, serverValue: string, locked: boolean) {
   const [value, setValueState] = useState(serverValue);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const valueRef = useRef(serverValue);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dirty = useRef(false);
+  const pendingValue = useRef<string | null>(null);
+  const editVersion = useRef(0);
+  const activeSaves = useRef(0);
+  const saveChain = useRef<Promise<void>>(Promise.resolve());
+  const protectUntil = useRef(0);
+  const lastSavedValue = useRef(serverValue);
 
-  useEffect(() => { if (!dirty.current) setValueState(serverValue); }, [serverValue]);
+  useEffect(() => { valueRef.current = value; }, [value]);
+
+  useEffect(() => {
+    if (serverValue === valueRef.current) {
+      lastSavedValue.current = serverValue;
+      protectUntil.current = 0;
+      return;
+    }
+    const localWorkPending = pendingValue.current !== null || timer.current !== null || activeSaves.current > 0;
+    const protectingFreshLocalSave = Date.now() < protectUntil.current && valueRef.current === lastSavedValue.current;
+    if (!localWorkPending && !protectingFreshLocalSave) {
+      setValueState(serverValue);
+      valueRef.current = serverValue;
+      lastSavedValue.current = serverValue;
+      setStatus('idle');
+    }
+  }, [serverValue]);
+
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+
+  function queueSave(next: string, version: number) {
+    activeSaves.current += 1;
+    saveChain.current = saveChain.current
+      .catch(() => undefined)
+      .then(async () => {
+        try {
+          const res = await fetch('/api/team/quiz-answer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questionId, answer: next }),
+          });
+          if (res.ok) {
+            lastSavedValue.current = next;
+            protectUntil.current = Date.now() + 6000;
+            if (version === editVersion.current && pendingValue.current === null) setStatus('saved');
+          } else if (version === editVersion.current) {
+            setStatus('error');
+          }
+        } catch {
+          if (version === editVersion.current) setStatus('error');
+        } finally {
+          activeSaves.current = Math.max(0, activeSaves.current - 1);
+        }
+      });
+    return saveChain.current;
+  }
+
+  function flush() {
+    if (locked) return Promise.resolve();
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    const next = pendingValue.current;
+    if (next === null) return saveChain.current;
+    const version = editVersion.current;
+    pendingValue.current = null;
+    return queueSave(next, version);
+  }
 
   function setValue(next: string) {
     if (locked) return;
+    editVersion.current += 1;
+    valueRef.current = next;
     setValueState(next);
-    dirty.current = true;
+    pendingValue.current = next;
     setStatus('saving');
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(async () => {
-      const res = await fetch('/api/team/quiz-answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ questionId, answer: next }),
-      });
-      dirty.current = false;
-      setStatus(res.ok ? 'saved' : 'error');
-    }, 400);
+    timer.current = setTimeout(() => { timer.current = null; void flush(); }, 500);
   }
 
-  return { value, setValue, status };
+  return { value, setValue, status, flush };
 }
 
 function parseList(raw: string, count: number) {
@@ -185,6 +239,7 @@ function QuestionCard({ question, serverValue, locked, scoring, musicRoundSettin
             placeholder="Person"
             value={values[index]}
             disabled={locked}
+            onBlur={() => { void autosave.flush(); }}
             onChange={(e) => {
               const next = [...values];
               next[index] = e.target.value;
@@ -217,6 +272,7 @@ function QuestionCard({ question, serverValue, locked, scoring, musicRoundSettin
             placeholder="Jahr"
             value={values[item] ?? ''}
             disabled={locked}
+            onBlur={() => { void autosave.flush(); }}
             onChange={(e) => autosave.setValue(JSON.stringify({ ...values, [item]: e.target.value }))}
           />
         </label>)}
@@ -231,7 +287,7 @@ function QuestionCard({ question, serverValue, locked, scoring, musicRoundSettin
 
   return <label className={`question-card ${savedClass}`}>
     <QuestionHeader question={question} scoring={scoring} />
-    <textarea rows={question.type === 'textarea' ? 5 : 2} value={autosave.value} onChange={(e) => autosave.setValue(e.target.value)} disabled={locked} />
+    <textarea rows={question.type === 'textarea' ? 5 : 2} value={autosave.value} onChange={(e) => autosave.setValue(e.target.value)} onBlur={() => { void autosave.flush(); }} disabled={locked} />
     <SaveState status={autosave.status} />
   </label>;
 }
@@ -239,48 +295,123 @@ function QuestionCard({ question, serverValue, locked, scoring, musicRoundSettin
 
 function MusicRoundCard({ question, serverValue, locked, scoring, settings }: { question: Question; serverValue: string; locked: boolean; scoring: ScoringConfig; settings: MusicRoundSettings }) {
   const tracks = question.tracks ?? [];
-  const [music, setMusic] = useState<MusicAnswerState>(() => parseMusicAnswer(serverValue, tracks.length));
+  const initial = parseMusicAnswer(serverValue, tracks.length);
+  const [music, setMusicState] = useState<MusicAnswerState>(initial);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [revealing, setRevealing] = useState<number | null>(null);
-  const dirty = useRef(false);
-  const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const musicRef = useRef<MusicAnswerState>(initial);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editVersion = useRef(0);
+  const activeSaves = useRef(0);
+  const saveChain = useRef<Promise<{ ok: boolean; music?: MusicAnswerState }>>(Promise.resolve({ ok: true }));
+  const protectUntil = useRef(0);
+  const lastSavedSerialized = useRef(JSON.stringify(initial));
+
+  function setMusic(next: MusicAnswerState) {
+    musicRef.current = next;
+    setMusicState(next);
+  }
 
   useEffect(() => {
-    if (!dirty.current) setMusic(parseMusicAnswer(serverValue, tracks.length));
+    const incoming = parseMusicAnswer(serverValue, tracks.length);
+    const incomingSerialized = JSON.stringify(incoming);
+    const localSerialized = JSON.stringify(musicRef.current);
+    if (incomingSerialized === localSerialized) {
+      lastSavedSerialized.current = incomingSerialized;
+      protectUntil.current = 0;
+      return;
+    }
+    const localWorkPending = timer.current !== null || activeSaves.current > 0;
+    const protectingFreshLocalSave = Date.now() < protectUntil.current && localSerialized === lastSavedSerialized.current;
+    if (!localWorkPending && !protectingFreshLocalSave) {
+      setMusic(incoming);
+      setStatus('idle');
+    }
   }, [serverValue, tracks.length]);
-  useEffect(() => () => Object.values(timers.current).forEach(clearTimeout), []);
+
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+
+  function persist(snapshot: MusicAnswerState, version: number) {
+    activeSaves.current += 1;
+    saveChain.current = saveChain.current
+      .catch(() => ({ ok: false }))
+      .then(async () => {
+        try {
+          const res = await fetch('/api/team/music-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questionId: question.id, music: snapshot }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.music) {
+            if (version === editVersion.current) setStatus('error');
+            return { ok: false };
+          }
+          const saved = parseMusicAnswer(JSON.stringify(data.music), tracks.length);
+          const current = musicRef.current;
+          const merged: MusicAnswerState = {
+            answers: current.answers,
+            stages: current.stages.map((stage, i) => Math.max(stage, saved.stages[i] ?? 1)),
+          };
+          setMusic(merged);
+          lastSavedSerialized.current = JSON.stringify(merged);
+          protectUntil.current = Date.now() + 6000;
+          if (version === editVersion.current && timer.current === null) setStatus('saved');
+          return { ok: true, music: saved };
+        } catch {
+          if (version === editVersion.current) setStatus('error');
+          return { ok: false };
+        } finally {
+          activeSaves.current = Math.max(0, activeSaves.current - 1);
+        }
+      });
+    return saveChain.current;
+  }
+
+  function flushAnswers() {
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    return persist(musicRef.current, editVersion.current);
+  }
 
   function updateAnswer(index: number, value: string) {
     if (locked) return;
-    setMusic((current) => ({ ...current, answers: current.answers.map((v, i) => i === index ? value : v) }));
-    dirty.current = true;
+    editVersion.current += 1;
+    const next: MusicAnswerState = {
+      ...musicRef.current,
+      answers: musicRef.current.answers.map((v, i) => i === index ? value : v),
+    };
+    setMusic(next);
     setStatus('saving');
-    if (timers.current[index]) clearTimeout(timers.current[index]);
-    timers.current[index] = setTimeout(async () => {
-      const res = await fetch('/api/team/music-answer', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ questionId: question.id, trackIndex: index, answer: value }),
-      });
-      const data = await res.json().catch(() => ({}));
-      dirty.current = false;
-      if (res.ok && data.music) { setMusic(data.music); setStatus('saved'); }
-      else setStatus('error');
-    }, 350);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => { timer.current = null; void persist(musicRef.current, editVersion.current); }, 500);
   }
 
   async function reveal(index: number) {
-    if (locked || revealing !== null) return music.stages[index];
+    if (locked || revealing !== null) return musicRef.current.stages[index] ?? 1;
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    await persist(musicRef.current, editVersion.current);
+
+    const before = musicRef.current;
+    const oldStage = before.stages[index] ?? 1;
+    const nextStage = Math.min(4, oldStage + 1);
+    if (nextStage === oldStage) return oldStage;
+    editVersion.current += 1;
+    const version = editVersion.current;
+    const next: MusicAnswerState = {
+      answers: [...before.answers],
+      stages: before.stages.map((stage, i) => i === index ? nextStage : stage),
+    };
+    setMusic(next);
+    setStatus('saving');
     setRevealing(index);
-    const res = await fetch('/api/team/music-stage', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ questionId: question.id, trackIndex: index }),
-    });
-    const data = await res.json().catch(() => ({}));
+    const result = await persist(next, version);
     setRevealing(null);
-    if (!res.ok || !data.music) { setStatus('error'); return music.stages[index]; }
-    setMusic(data.music);
-    setStatus('saved');
-    return data.music.stages[index] as number;
+    if (!result.ok && version === editVersion.current) {
+      const current = musicRef.current;
+      setMusic({ ...current, stages: current.stages.map((stage, i) => i === index ? oldStage : stage) });
+      return oldStage;
+    }
+    return musicRef.current.stages[index] ?? nextStage;
   }
 
   return <div className={`question-card ${status === 'saved' ? 'saved' : ''}`}>
@@ -297,6 +428,7 @@ function MusicRoundCard({ question, serverValue, locked, scoring, settings }: { 
         locked={locked}
         revealing={revealing === index}
         onAnswer={(value) => updateAnswer(index, value)}
+        onAnswerBlur={flushAnswers}
         onReveal={() => reveal(index)}
       />)}
     </div>
@@ -304,7 +436,7 @@ function MusicRoundCard({ question, serverValue, locked, scoring, settings }: { 
   </div>;
 }
 
-function MusicTrackCard({ track, index, answer, stage, durations, stagePoints, locked, revealing, onAnswer, onReveal }: {
+function MusicTrackCard({ track, index, answer, stage, durations, stagePoints, locked, revealing, onAnswer, onAnswerBlur, onReveal }: {
   track: { label: string; src: string };
   index: number;
   answer: string;
@@ -314,6 +446,7 @@ function MusicTrackCard({ track, index, answer, stage, durations, stagePoints, l
   locked: boolean;
   revealing: boolean;
   onAnswer: (value: string) => void;
+  onAnswerBlur: () => Promise<unknown>;
   onReveal: () => Promise<number>;
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -364,6 +497,6 @@ function MusicTrackCard({ track, index, answer, stage, durations, stagePoints, l
       {stage < 4 && <button type="button" className="secondary" disabled={locked || revealing} onClick={more}>{revealing ? 'Öffnet…' : `Mehr hören: ${durations[stage]}s · danach max. ${String(stagePoints[stage] ?? 0).replace('.', ',')} P.`}</button>}
     </div>
     <div className="music-progress" aria-hidden="true"><span style={{ width: `${Math.min(100, currentDuration > 0 ? (elapsed / currentDuration) * 100 : 0)}%` }} /></div>
-    <input type="text" placeholder="Songtitel" value={answer} disabled={locked} onChange={(e) => onAnswer(e.target.value)} />
+    <input type="text" placeholder="Songtitel" value={answer} disabled={locked} onChange={(e) => onAnswer(e.target.value)} onBlur={() => { void onAnswerBlur(); }} />
   </div>;
 }
