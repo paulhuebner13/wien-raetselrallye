@@ -10,8 +10,8 @@ export const scoringConfig = scoringRaw as ScoringConfig;
 if (rallyeConfig.stationCount !== rallyeConfig.stations.length) {
   throw new Error('stationCount muss der Anzahl der Stationen entsprechen.');
 }
-if (!rallyeConfig.stations.some((s) => s.id === rallyeConfig.finalStationId)) {
-  throw new Error('finalStationId muss eine vorhandene Station sein.');
+if (!rallyeConfig.finish?.title) {
+  throw new Error('finish.title fehlt.');
 }
 
 export function distributeBlocks(blocks: QuestionBlock[], stationCount: number) {

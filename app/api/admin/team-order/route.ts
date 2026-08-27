@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const teamId = String(body.teamId ?? '');
   const order = Array.isArray(body.stationOrder) ? body.stationOrder.map(Number) : [];
-  if (!teamId || !validateStationOrder(order)) return bad('Reihenfolge ungültig. Die letzte Station muss die Finalstation sein.');
+  if (!teamId || !validateStationOrder(order)) return bad('Reihenfolge ungültig. Jede Station muss genau einmal vorkommen.');
   const { error } = await supabaseAdmin().from('teams').update({ station_order: order }).eq('id', teamId);
   if (error) return bad(error.message, 500);
   return ok({ ok: true });

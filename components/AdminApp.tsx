@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { blockLabel, questionBlocks, questionPoints, rallyeConfig, scoringConfig, stationTaskPoints } from '@/lib/config';
-import { supabaseBrowser } from '@/lib/supabase-browser';
+import type { Question } from '@/lib/types';
 
+type EvalType = 'question' | 'station' | 'guinness' | 'architecture' | 'beer';
 type Team = { id: string; name: string; station_order: number[] | null };
 type Overview = {
   teams: Team[];
@@ -12,24 +13,18 @@ type Overview = {
   beers: Array<{ id: string; team_id: string; brand: string; image_url?: string | null }>;
   guinness: Array<{ id: string; team_id: string; street: string; image_url?: string | null }>;
   architecture: Array<{ id: string; team_id: string; style: string; building_name: string; image_url?: string | null }>;
-  pictureRoundImages: Array<{ slot: number; image_url: string | null }>;
-  evaluations: Array<{ team_id: string; item_type: 'question' | 'station' | 'guinness' | 'architecture' | 'beer'; item_id: string; is_valid: boolean }>;
+  evaluations: Array<{ team_id: string; item_type: EvalType; item_id: string; is_valid: boolean }>;
   deadlineAt: string | null;
 };
 
 type Constraint = { id: number; a: string; b: string; mode: 'together' | 'apart' };
 
-function defaultOrder() {
-  return [...rallyeConfig.stations.filter((s) => s.id !== rallyeConfig.finalStationId).map((s) => s.id), rallyeConfig.finalStationId];
-}
+function defaultOrder() { return rallyeConfig.stations.map((s) => s.id); }
 
 function validConfiguredOrder(order: number[] | null | undefined) {
   if (!Array.isArray(order)) return false;
   const ids = rallyeConfig.stations.map((s) => s.id);
-  return order.length === ids.length
-    && new Set(order).size === ids.length
-    && ids.every((id) => order.includes(id))
-    && order[order.length - 1] === rallyeConfig.finalStationId;
+  return order.length === ids.length && new Set(order).size === ids.length && ids.every((id) => order.includes(id));
 }
 
 function toLocalInput(iso: string | null) {
@@ -39,8 +34,22 @@ function toLocalInput(iso: string | null) {
   return shifted.toISOString().slice(0, 19);
 }
 
-function parseNames(raw: string) {
-  return [...new Set(raw.split(/[\n,;]+/).map((x) => x.trim()).filter(Boolean))];
+function parseNames(raw: string) { return [...new Set(raw.split(/[\n,;]+/).map((x) => x.trim()).filter(Boolean))]; }
+
+function parseList(raw: string | undefined, count: number) {
+  try {
+    const data = JSON.parse(raw ?? '');
+    if (Array.isArray(data)) return Array.from({ length: count }, (_, i) => String(data[i] ?? ''));
+  } catch {}
+  return Array(count).fill('') as string[];
+}
+
+function parseMap(raw: string | undefined) {
+  try {
+    const data = JSON.parse(raw ?? '');
+    if (data && typeof data === 'object' && !Array.isArray(data)) return data as Record<string, string>;
+  } catch {}
+  return {} as Record<string, string>;
 }
 
 function generateTeams(names: string[], teamCount: number, constraints: Constraint[]) {
@@ -151,8 +160,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     const res = await fetch('/api/admin/team-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, stationOrder }) });
     const data = await res.json(); if (!res.ok) return setError(data.error ?? 'Fehler.'); await load();
   }
-
-  async function setEvaluation(teamId: string, itemType: 'question' | 'station' | 'guinness' | 'architecture' | 'beer', itemId: string, isValid: boolean) {
+  async function setEvaluation(teamId: string, itemType: EvalType, itemId: string, isValid: boolean) {
     const res = await fetch('/api/admin/evaluation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ teamId, itemType, itemId, isValid }) });
     if (!res.ok) return setError((await res.json()).error ?? 'Fehler.');
     setOverview((current) => current ? { ...current, evaluations: [
@@ -160,9 +168,19 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
       { team_id: teamId, item_type: itemType, item_id: itemId, is_valid: isValid },
     ] } : current);
   }
-
-  function evaluationIsValid(teamId: string, itemType: 'question' | 'station' | 'guinness' | 'architecture' | 'beer', itemId: string) {
+  function evaluationIsValid(teamId: string, itemType: EvalType, itemId: string) {
     return overview?.evaluations.some((e) => e.team_id === teamId && e.item_type === itemType && e.item_id === itemId && e.is_valid) ?? false;
+  }
+
+  function specialQuestionScore(teamId: string, q: Question) {
+    if (q.type === 'picture_round') {
+      const count = (q.images ?? []).filter((_, i) => evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)).length;
+      return count === 8 ? 2 : count > 4 ? 1 : 0;
+    }
+    if (q.type === 'music_round') {
+      return (q.tracks ?? []).filter((_, i) => evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)).length;
+    }
+    return evaluationIsValid(teamId, 'question', q.id) ? questionPoints(q.id) : 0;
   }
 
   function teamScore(teamId: string) {
@@ -170,25 +188,11 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     const progress = overview.progress.filter((p) => p.team_id === teamId);
     const hints = progress.reduce((sum, p) => sum + (p.submitted_at ? Math.max(0, scoringConfig.hintPointsMax - (p.hints_used ?? 0)) : 0), 0);
     const stations = rallyeConfig.stations.reduce((sum, station) => sum + (evaluationIsValid(teamId, 'station', String(station.id)) ? stationTaskPoints(station.id) : 0), 0);
-    const quiz = questionBlocks.flatMap((b) => b.questions).reduce((sum, q) => sum + (evaluationIsValid(teamId, 'question', q.id) ? questionPoints(q.id) : 0), 0);
+    const quiz = questionBlocks.flatMap((b) => b.questions).reduce((sum, q) => sum + specialQuestionScore(teamId, q), 0);
     const guinness = overview.guinness.filter((g) => g.team_id === teamId && evaluationIsValid(teamId, 'guinness', g.id)).length * scoringConfig.guinnessPerLogo;
     const architecture = overview.architecture.filter((a) => a.team_id === teamId && evaluationIsValid(teamId, 'architecture', a.id)).length * scoringConfig.architecturePerStyle;
     const beer = overview.beers.filter((b) => b.team_id === teamId && evaluationIsValid(teamId, 'beer', b.id)).length * scoringConfig.beerPerUniqueCan;
     return { total: hints + stations + quiz + guinness + architecture + beer, hints, stations, quiz, guinness, architecture, beer };
-  }
-
-  async function uploadPicture(slot: number, file: File) {
-    if (file.size > 20 * 1024 * 1024) return setError('Bild ist größer als 20 MB.');
-    const ticketRes = await fetch('/api/admin/picture-round/upload-ticket', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slot, fileName: file.name, contentType: file.type }) });
-    const ticket = await ticketRes.json(); if (!ticketRes.ok) return setError(ticket.error ?? 'Fehler.');
-    const upload = await supabaseBrowser().storage.from('quiz-assets').uploadToSignedUrl(ticket.path, ticket.token, file, { contentType: file.type });
-    if (upload.error) return setError('Upload fehlgeschlagen.');
-    const save = await fetch('/api/admin/picture-round', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slot, path: ticket.path }) });
-    if (!save.ok) return setError((await save.json()).error ?? 'Fehler.'); await load();
-  }
-  async function removePicture(slot: number) {
-    if (!confirm(`Bild ${slot} löschen?`)) return;
-    await fetch('/api/admin/picture-round', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slot }) }); await load();
   }
 
   const players = useMemo(() => parseNames(playerText), [playerText]);
@@ -200,6 +204,45 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     setDrawError('');
     try { setDrawResult(generateTeams(players, drawTeamCount, constraints)); }
     catch (e) { setDrawResult(null); setDrawError(e instanceof Error ? e.message : 'Auslosung fehlgeschlagen.'); }
+  }
+
+  function renderQuestionEvaluation(teamId: string, q: Question, rawAnswer: string | undefined) {
+    if (q.type === 'picture_round') {
+      const images = q.images ?? Array.from({ length: 8 }, (_, i) => `/picture-round/${i + 1}.jpg`);
+      const values = parseList(rawAnswer, images.length);
+      const correct = images.filter((_, i) => evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)).length;
+      const points = correct === 8 ? 2 : correct > 4 ? 1 : 0;
+      return <div className="special-eval-grid">
+        {images.map((src, i) => <article className="special-eval-item" key={src}>
+          <img src={src} alt={`Picture Round ${i + 1}`} />
+          <b>{i + 1}. {values[i] || '—'}</b>
+          <label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)} onChange={(e) => setEvaluation(teamId, 'question', `${q.id}:${i + 1}`, e.target.checked)} /> Richtig</label>
+        </article>)}
+        <strong className="special-score">{correct}/8 richtig → {points} P.</strong>
+      </div>;
+    }
+    if (q.type === 'music_round') {
+      const tracks = q.tracks ?? [];
+      const values = parseList(rawAnswer, tracks.length);
+      const correct = tracks.filter((_, i) => evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)).length;
+      return <div className="special-eval-grid music-admin-grid">
+        {tracks.map((track, i) => <article className="special-eval-item" key={track.src}>
+          <b>{track.label}</b>
+          <audio controls preload="none" src={track.src} />
+          <span>{values[i] || '—'}</span>
+          <label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(teamId, 'question', `${q.id}:${i + 1}`)} onChange={(e) => setEvaluation(teamId, 'question', `${q.id}:${i + 1}`, e.target.checked)} /> Richtig</label>
+        </article>)}
+        <strong className="special-score">{correct}/2 richtig → {correct} P.</strong>
+      </div>;
+    }
+    if (q.type === 'matching') {
+      const values = parseMap(rawAnswer);
+      return <div className="evaluation-answer matching-admin-answer">
+        <div>{(q.items ?? []).map((item) => <span key={item}><b>{item}</b>: {values[item] || '—'}</span>)}</div>
+        <label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(teamId, 'question', q.id)} onChange={(e) => setEvaluation(teamId, 'question', q.id, e.target.checked)} /> Richtig (+{questionPoints(q.id)} P.)</label>
+      </div>;
+    }
+    return <div className="evaluation-answer"><strong>{rawAnswer || '—'}</strong><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(teamId, 'question', q.id)} onChange={(e) => setEvaluation(teamId, 'question', q.id, e.target.checked)} /> Richtig (+{questionPoints(q.id)} P.)</label></div>;
   }
 
   if (!loggedIn) return <main className="login-shell"><section className="login-card"><div className="eyebrow">ADMIN</div><h1>Rätselrallye</h1><form className="stack" onSubmit={login}><label>Passwort<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>{error && <p className="error-text">{error}</p>}<button className="primary">Login</button></form></section></main>;
@@ -221,7 +264,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
       <div className="team-order-list">{overview.teams.map((t) => <div className="team-order-row" key={t.id}>
         <b>{t.name}</b><label>Stations-Reihenfolge<input value={orderInputs[t.id] ?? ''} onChange={(e) => setOrderInputs((x) => ({ ...x, [t.id]: e.target.value }))} /></label><button className="secondary" onClick={() => saveOrder(t.id)}>Speichern</button><button className="danger-link" onClick={() => deleteTeam(t.id, t.name)}>Löschen</button>
       </div>)}</div>
-      <p className="muted">IDs mit Komma, z. B. 2, 1, 3. Finalstation {rallyeConfig.finalStationId} muss zuletzt bleiben.</p>
+      <p className="muted">Alle Stations-IDs genau einmal, z. B. 2, 4, 1, 3. Johnny's Pub gehört nicht zur Reihenfolge.</p>
     </section>
 
     <section className="admin-panel">
@@ -234,16 +277,9 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
       {drawResult && <div className="draw-result">{drawResult.map((members, i) => <article className="admin-card" key={i}><b>Team {String.fromCharCode(65 + i)}</b>{members.map((m) => <span key={m}>{m}</span>)}</article>)}</div>}
     </section>
 
-    <section className="admin-panel">
-      <h2>Picture Round</h2>
-      <p className="muted">8 Länderumrisse. Reihenfolge 1–8.</p>
-      <div className="picture-admin-grid">{Array.from({ length: 8 }, (_, i) => i + 1).map((slot) => {
-        const image = overview.pictureRoundImages.find((x) => x.slot === slot)?.image_url;
-        return <article className="picture-admin-card" key={slot}><b>Bild {slot}</b>{image && <img src={image} alt={`Picture Round ${slot}`} />}<label className="file-button">{image ? 'Ersetzen' : 'Hochladen'}<input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPicture(slot, f); e.currentTarget.value = ''; }} /></label>{image && <button className="danger-link" onClick={() => removePicture(slot)}>Löschen</button>}</article>;
-      })}</div>
-    </section>
+    <section className="admin-panel"><h2>Quiz-Dateien</h2><p className="muted">Picture Round: <code>public/picture-round/1.jpg</code> bis <code>8.jpg</code>. Music Round: <code>public/music-round/1.mp3</code> und <code>2.mp3</code>.</p></section>
 
-    <section className="admin-panel"><h2>Punkte</h2><p className="muted">Bearbeiten in <code>config/scoring.json</code>.</p><div className="score-summary"><span>Standardfrage: <b>{scoringConfig.questionDefault}</b></span><span>Guinness: <b>{scoringConfig.guinnessPerLogo}/Logo</b></span><span>Architektur: <b>{scoringConfig.architecturePerStyle}/Stil</b></span><span>Wegbier: <b>{scoringConfig.beerPerUniqueCan}/Bier</b></span></div></section>
+    <section className="admin-panel"><h2>Punkte</h2><p className="muted">Bearbeiten in <code>config/scoring.json</code>.</p><div className="score-summary"><span>Standardfrage: <b>{scoringConfig.questionDefault}</b></span><span>Picture Round: <b>0/1/2</b></span><span>Music Round: <b>0/1/2</b></span><span>Guinness: <b>{scoringConfig.guinnessPerLogo}/Logo</b></span><span>Architektur: <b>{scoringConfig.architecturePerStyle}/Stil</b></span><span>Wegbier: <b>{scoringConfig.beerPerUniqueCan}/Bier</b></span></div></section>
 
     <section className="admin-panel">
       <h2>Auswertung</h2>
@@ -268,7 +304,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
         })}</div>
 
         <h3>Quiz</h3>
-        {questionBlocks.map((block) => <div key={block.id} className="admin-question-block"><b>{blockLabel(block)}</b><div className="admin-list">{block.questions.map((q) => <div key={q.id} className="admin-answer-row"><span><b>{q.category} · {questionPoints(q.id)} P.</b><br />{q.text}</span><div className="evaluation-answer"><strong>{answers[q.id] || '—'}</strong><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'question', q.id)} onChange={(e) => setEvaluation(team.id, 'question', q.id, e.target.checked)} /> Richtig</label></div></div>)}</div></div>)}
+        {questionBlocks.map((block) => <div key={block.id} className="admin-question-block"><b>{blockLabel(block)}</b><div className="admin-list">{block.questions.map((q) => <div key={q.id} className={`admin-answer-row ${q.type === 'picture_round' || q.type === 'music_round' ? 'special-question-row' : ''}`}><span><b>{q.category} · max. {questionPoints(q.id)} P.</b><br />{q.text}</span>{renderQuestionEvaluation(team.id, q, answers[q.id])}</div>)}</div></div>)}
 
         <h3>Guinness</h3>
         <div className="admin-photo-grid">{guinness.map((g) => <div className="admin-photo" key={g.id}>{g.image_url && <img src={g.image_url} alt="Guinness" />}<b>{g.street}</b><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'guinness', g.id)} onChange={(e) => setEvaluation(team.id, 'guinness', g.id, e.target.checked)} /> Gültig (+{scoringConfig.guinnessPerLogo} P.)</label></div>)}</div>

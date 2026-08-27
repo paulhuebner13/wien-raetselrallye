@@ -13,8 +13,10 @@
       "Keine digitale Navigation. Nur der mitgegebene Stadtplan ist erlaubt."
     ]
   },
-  "stationCount": 3,
-  "finalStationId": 3,
+  "stationCount": 4,
+  "finish": {
+    "title": "Johnny's Pub"
+  },
   "architectureStyles": [
     {
       "name": "Gotik",
@@ -45,42 +47,57 @@
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
-        "/stations/1/1_1.svg",
-        "/stations/1/1_2.svg",
-        "/stations/1/1_3.svg",
-        "/stations/1/1_4.svg",
-        "/stations/1/1_5.svg",
-        "/stations/1/1_6.svg"
+        "/stations/1/1_1.jpg",
+        "/stations/1/1_2.jpg",
+        "/stations/1/1_3.jpg",
+        "/stations/1/1_4.jpg",
+        "/stations/1/1_5.jpg",
+        "/stations/1/1_6.jpg"
       ]
     },
     {
       "id": 2,
       "title": "Station 2",
-      "text": "Findet vor Ort das gesuchte Schild und tragt die Antwort ein.",
-      "answerLabel": "Antwort",
+      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
-        "/stations/2/2_1.svg",
-        "/stations/2/2_2.svg",
-        "/stations/2/2_3.svg",
-        "/stations/2/2_4.svg",
-        "/stations/2/2_5.svg",
-        "/stations/2/2_6.svg"
+        "/stations/2/2_1.jpg",
+        "/stations/2/2_2.jpg",
+        "/stations/2/2_3.jpg",
+        "/stations/2/2_4.jpg",
+        "/stations/2/2_5.jpg",
+        "/stations/2/2_6.jpg"
       ]
     },
     {
       "id": 3,
-      "title": "Johnny's Pub",
-      "text": "Letzte Station: Findet den Ort und löst die Aufgabe. Bis zum Timer-Ende müsst ihr hier sein.",
-      "answerLabel": "Antwort",
+      "title": "Station 3",
+      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
-        "/stations/3/3_1.svg",
-        "/stations/3/3_2.svg",
-        "/stations/3/3_3.svg",
-        "/stations/3/3_4.svg",
-        "/stations/3/3_5.svg",
-        "/stations/3/3_6.svg"
+        "/stations/3/3_1.jpg",
+        "/stations/3/3_2.jpg",
+        "/stations/3/3_3.jpg",
+        "/stations/3/3_4.jpg",
+        "/stations/3/3_5.jpg",
+        "/stations/3/3_6.jpg"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Station 4",
+      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "answerLabel": "Lösung",
+      "taskPoints": 5,
+      "images": [
+        "/stations/4/4_1.jpg",
+        "/stations/4/4_2.jpg",
+        "/stations/4/4_3.jpg",
+        "/stations/4/4_4.jpg",
+        "/stations/4/4_5.jpg",
+        "/stations/4/4_6.jpg"
       ]
     }
   ]

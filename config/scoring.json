@@ -4,11 +4,12 @@
   "stationTaskPoints": {
     "1": 5,
     "2": 5,
-    "3": 5
+    "3": 5,
+    "4": 5
   },
   "questionDefault": 1,
   "questionPoints": {
-    "picture-round": 8,
+    "picture-round": 2,
     "geo-neighbours": 1,
     "geo-flags": 1,
     "history-1": 1,
@@ -16,7 +17,7 @@
     "politics-1": 1,
     "ancient-1": 1,
     "politics-2": 1,
-    "sport-1": 1,
+    "sport-founded": 1,
     "nature-lizard": 1,
     "bonus-alcohol": 1,
     "literature-1": 1,
@@ -28,7 +29,7 @@
     "music-1": 1,
     "music-2": 1,
     "lyrics-1": 1,
-    "played-song": 1
+    "music-round": 2
   },
   "guinnessPerLogo": 1,
   "architecturePerStyle": 1,

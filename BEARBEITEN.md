@@ -1,131 +1,128 @@
-# Inhalte bearbeiten
+# Rallye bearbeiten
 
-## Stationsbilder: JPG ist erlaubt
+## 1. Stationen
 
-Die Stationsbilder müssen **nicht** SVG sein. JPG, JPEG, PNG und WebP funktionieren ebenfalls.
+Datei:
 
-Beispiel für Station 1:
+`config/stations.json`
 
-```text
-public/stations/1/1_1.jpg
-public/stations/1/1_2.jpg
-public/stations/1/1_3.jpg
-public/stations/1/1_4.jpg
-public/stations/1/1_5.jpg
-public/stations/1/1_6.jpg
-```
+Aktuell gibt es **4 normale Stationen**. Johnny's Pub ist **keine Station**, sondern nur der feste Endpunkt auf der Rallye-Karte.
 
-Danach in `config/stations.json` die Pfade entsprechend eintragen:
+Die vier Stationen haben die IDs `1`, `2`, `3`, `4`. Im Admin kannst du für jedes Team eine andere Reihenfolge eintragen, z. B.:
+
+`2, 4, 1, 3`
+
+Jede Stations-ID muss genau einmal vorkommen.
+
+### Stationsbilder
+
+Die Bilder liegen direkt in GitHub unter:
+
+- `public/stations/1/1_1.jpg` bis `1_6.jpg`
+- `public/stations/2/2_1.jpg` bis `2_6.jpg`
+- `public/stations/3/3_1.jpg` bis `3_6.jpg`
+- `public/stations/4/4_1.jpg` bis `4_6.jpg`
+
+Die vorhandenen JPGs sind nur Platzhalter. Einfach durch deine eigenen JPG-Dateien mit denselben Namen ersetzen.
+
+Bild 1 = 5 Hinweispunkte. Jeder weitere Hinweis kostet 1 Punkt. Bild 6 = 0 Hinweispunkte.
+
+### Mehr als 4 Stationen
+
+1. In `config/stations.json` `stationCount` erhöhen.
+2. Unter `stations` ein weiteres Stationsobjekt ergänzen.
+3. Einen Ordner wie `public/stations/5/` erstellen.
+4. Dort `5_1.jpg` bis `5_6.jpg` ablegen.
+5. In `config/scoring.json` bei Bedarf Punkte für Station 5 ergänzen.
+
+Johnny's Pub bleibt unabhängig davon immer der Endpunkt und braucht keine Bilder oder Hinweise.
+
+## 2. Johnny's Pub
+
+Der Endpunkt steht in `config/stations.json`:
 
 ```json
-"images": [
-  "/stations/1/1_1.jpg",
-  "/stations/1/1_2.jpg",
-  "/stations/1/1_3.jpg",
-  "/stations/1/1_4.jpg",
-  "/stations/1/1_5.jpg",
-  "/stations/1/1_6.jpg"
-]
-```
-
-Die Reihenfolge ist wichtig: erstes Bild = schwierigster Hinweis = 5 Punkte. Jedes weitere Bild kostet 1 Hinweispunkt. Bei 6 Bildern ergeben sich 5, 4, 3, 2, 1, 0 Punkte.
-
-## Stationen ändern oder hinzufügen
-
-Datei: `config/stations.json`
-
-Jede normale Station ist ein Objekt in `stations`:
-
-```json
-{
-  "id": 4,
-  "title": "Station 4",
-  "text": "Findet vor Ort ...",
-  "answerLabel": "Antwort",
-  "taskPoints": 5,
-  "images": [
-    "/stations/4/4_1.jpg",
-    "/stations/4/4_2.jpg",
-    "/stations/4/4_3.jpg",
-    "/stations/4/4_4.jpg",
-    "/stations/4/4_5.jpg",
-    "/stations/4/4_6.jpg"
-  ]
+"finish": {
+  "title": "Johnny's Pub"
 }
 ```
 
-Für Station 4 zusätzlich den Ordner `public/stations/4/` anlegen und dort die Bilder ablegen.
+Er erscheint nach **Antworten prüfen** als letzter Punkt auf der Karte. Er hat keine Tipps, keine Antwort und keine Stationspunkte.
 
-`stationCount` muss immer der Gesamtzahl der Stationen entsprechen.
+## 3. Fragen und Kategorien
 
-Johnny's Pub ist aktuell Station-ID `3` und bleibt durch
+Datei:
 
-```json
-"finalStationId": 3
-```
+`config/questions.json`
 
-immer die Finalstation. Neue Stationen können also IDs 4, 5, 6 usw. bekommen, ohne Johnny umzubenennen. Im Admin muss jede Team-Reihenfolge alle Station-IDs genau einmal enthalten und mit `3` enden, z. B. bei fünf Stationen:
-
-```text
-2, 5, 1, 4, 3
-```
-
-Wenn nachträglich Stationen ergänzt werden, zeigt der Admin bei alten ungültigen Reihenfolgen automatisch wieder die vollständige Standardreihenfolge an.
-
-## Quizfragen ändern
-
-Datei: `config/questions.json`
-
-Eine Frage sieht z. B. so aus:
+Jede normale Frage hat mindestens:
 
 ```json
 {
-  "id": "geo-flags",
-  "category": "Geographie",
-  "text": "Welche Farbe ...?"
+  "id": "meine-frage",
+  "category": "Geschichte",
+  "text": "Meine Frage?"
 }
 ```
 
-- `id`: eindeutige technische ID. Nach Möglichkeit später nicht mehr ändern, wenn schon Antworten gespeichert wurden.
-- `category`: Kategorie, die direkt bei der einzelnen Frage angezeigt wird.
-- `text`: eigentlicher Fragetext.
+- `category` = Kategorie über der Frage
+- `text` = Fragetext
+- `id` = eindeutige technische ID; nach dem Start möglichst nicht mehr ändern
 
-## Kategorien der Fragenblöcke ändern
-
-Ebenfalls in `config/questions.json`.
-
-Jeder Block hat oben `categories`:
+Die Namen auf den Kacheln kommen aus `categories` des jeweiligen Blocks:
 
 ```json
-{
-  "id": "block-2",
-  "categories": ["Geschichte", "Politik", "Geschichte / Antike"],
-  "questions": [...]
-}
+"categories": ["Geschichte", "Politik"]
 ```
 
-Diese Liste bestimmt den Namen der Kachel im Rallye-Pfad, z. B.:
+## 4. Picture Round
 
-```text
-Fragen · Geschichte / Politik / Geschichte / Antike
-```
+Die 8 Bilder liegen direkt im Projekt:
 
-Die `category` jeder einzelnen Frage bestimmt dagegen die kleine Kategorie-Anzeige innerhalb des Fragenblocks.
+- `public/picture-round/1.jpg`
+- ...
+- `public/picture-round/8.jpg`
 
-Die Blöcke werden in der Reihenfolge verwendet, in der sie in `questions.json` stehen. Ein Block wird beim Verteilen zwischen den Stationen nie auseinandergerissen.
+Einfach durch deine Länderumrisse ersetzen und auf GitHub pushen.
 
-## Punkte ändern
+Im Admin kannst du für jedes der 8 Bilder einzeln **Richtig** anhaken.
 
-Datei: `config/scoring.json`
+Wertung:
 
-Hier stehen u. a.:
+- 0–4 richtig = 0 Punkte
+- 5–7 richtig = 1 Punkt
+- 8 richtig = 2 Punkte
 
-- maximale Hinweispunkte
-- Standardpunkte pro Stationsaufgabe
-- individuelle Punkte einzelner Stationen
-- Standardpunkte pro Quizfrage
-- individuelle Punkte einzelner Quizfragen
-- Punkte pro gültigem Guinness-Foto
-- Punkte pro Architekturstil
-- Punkte pro gültigem Dosenbier
+## 5. Fußballfrage
 
+In `config/questions.json` ist eine Zuordnungsfrage eingebaut:
+
+- SV Ried
+- Austria Wien
+- Rapid Wien
+- WSG Tirol
+
+Die möglichen Jahre stehen im Fragetext. Für jeden Club erscheint ein eigenes Jahresfeld.
+
+## 6. Music Round
+
+Die beiden MP3-Dateien liegen direkt im Projekt:
+
+- `public/music-round/1.mp3`
+- `public/music-round/2.mp3`
+
+Die vorhandenen Dateien sind nur stille Platzhalter. Durch deine MP3s mit denselben Namen ersetzen.
+
+Im Quiz gibt es für jeden Song einen Player und ein Feld für den Songtitel. Im Admin kannst du beide Songs einzeln als richtig markieren.
+
+Wertung: 0, 1 oder 2 Punkte.
+
+## 7. Punkte
+
+Datei:
+
+`config/scoring.json`
+
+Hier stellst du die Punkte für normale Fragen, Stationsaufgaben sowie Guinness, Architektur und Wegbier ein.
+
+Picture Round und Music Round werden automatisch mit maximal 2 Punkten gewertet.

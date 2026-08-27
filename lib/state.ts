@@ -5,18 +5,17 @@ import { getTeamStationOrder } from './team-order';
 
 export async function getTeamState(teamId: string) {
   const db = supabaseAdmin();
-  const [progressRes, quizRes, beerRes, guinnessRes, architectureRes, picturesRes, deadlineAt, stationOrder] = await Promise.all([
+  const [progressRes, quizRes, beerRes, guinnessRes, architectureRes, deadlineAt, stationOrder] = await Promise.all([
     db.from('station_progress').select('*').eq('team_id', teamId),
     db.from('quiz_answers').select('*').eq('team_id', teamId),
     db.from('beers').select('*').eq('team_id', teamId).order('brand'),
     db.from('guinness_entries').select('*').eq('team_id', teamId).order('created_at'),
     db.from('architecture_entries').select('*').eq('team_id', teamId).order('created_at'),
-    db.from('picture_round_images').select('*').order('slot'),
     getDeadlineAt(),
     getTeamStationOrder(teamId),
   ]);
 
-  for (const result of [progressRes, quizRes, beerRes, guinnessRes, architectureRes, picturesRes]) {
+  for (const result of [progressRes, quizRes, beerRes, guinnessRes, architectureRes]) {
     if (result.error) throw result.error;
   }
 
@@ -25,15 +24,10 @@ export async function getTeamState(teamId: string) {
     const { data } = await db.storage.from('team-uploads').createSignedUrl(path, 60 * 30);
     return data?.signedUrl ?? null;
   };
-  const signQuiz = async (path: string) => {
-    const { data } = await db.storage.from('quiz-assets').createSignedUrl(path, 60 * 30);
-    return data?.signedUrl ?? null;
-  };
 
   const beers = await Promise.all((beerRes.data ?? []).map(async (entry) => ({ ...entry, image_url: await signTeam(entry.storage_path) })));
   const guinness = await Promise.all((guinnessRes.data ?? []).map(async (entry) => ({ ...entry, image_url: await signTeam(entry.storage_path) })));
   const architecture = await Promise.all((architectureRes.data ?? []).map(async (entry) => ({ ...entry, image_url: await signTeam(entry.storage_path) })));
-  const pictureRoundImages = await Promise.all((picturesRes.data ?? []).map(async (entry) => ({ slot: entry.slot, image_url: await signQuiz(entry.storage_path) })));
 
   const progress = Object.fromEntries((progressRes.data ?? []).map((p) => [p.station_id, p]));
   const quiz = Object.fromEntries((quizRes.data ?? []).map((q) => [q.question_id, q.answer]));
@@ -61,10 +55,9 @@ export async function getTeamState(teamId: string) {
     beers,
     guinness,
     architecture,
-    pictureRoundImages,
     deadlineAt,
     locked,
-    finalStationTitle: rallyeConfig.stations.find((s) => s.id === rallyeConfig.finalStationId)?.title ?? "Johnny's Pub",
-    reviewUnlocked: stationStates.filter((s) => s.stationId !== rallyeConfig.finalStationId).every((s) => s.submitted),
+    finalStationTitle: rallyeConfig.finish.title,
+    reviewUnlocked: stationStates.every((s) => s.submitted),
   };
 }

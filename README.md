@@ -1,30 +1,18 @@
 # Wien Rätselrallye
 
-Mobile Rätselrallye mit Next.js, Supabase und Vercel.
+Next.js + Supabase Web-App für eine mobile Wiener Rätselrallye.
 
-Enthalten:
-- Team-Login + Admin
-- individuelle Stations-Reihenfolge
-- 5→0 Hinweis-Punkte
-- feste Stationsantworten + Admin-Reset
-- Quiz-Autosave + Picture Round
-- Deadline/Countdown
-- Guinness-, Architektur- und Wegbier-Fotochallenges
-- Team-Auslosung mit Paarregeln
-- dynamische JSON-Konfiguration
-- separates Punktesystem in `config/scoring.json`
+## Bearbeiten
 
-Einrichtung: siehe `SETUP.md`.
+Siehe `BEARBEITEN.md`.
 
+Wichtigste Dateien:
 
-## Aktuelle Version
+- `config/stations.json` – Stationen, Texte, Endpunkt, Architekturstile
+- `config/questions.json` – Fragen, Kategorien, Spezialfragen
+- `config/scoring.json` – Punkte
+- `public/stations/` – Stationshinweise als JPG
+- `public/picture-round/` – 8 Picture-Round-JPGs
+- `public/music-round/` – 2 MP3-Dateien
 
-- Guinness-Farbschema
-- Johnny's Pub als letzte Station nach der Fragenkontrolle
-- Regeln-Popup nur direkt nach Login; Info-Button öffnet es erneut
-- Admin-Auswertung mit manueller Gültigkeitsprüfung und Gesamtpunkten
-- Foto-Buttons der Team-Challenges öffnen auf Mobilgeräten die Kamera (`capture=environment`)
-
-## Inhalte bearbeiten
-
-Eine konkrete Übersicht für JPG-Stationsbilder, zusätzliche Stationen, Fragen und Kategorien steht in `BEARBEITEN.md`.
+Johnny's Pub ist nur der Endpunkt der Karte und keine Station mit Hinweisen.

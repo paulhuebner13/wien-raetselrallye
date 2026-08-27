@@ -75,12 +75,6 @@ create table if not exists public.app_settings (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.picture_round_images (
-  slot integer primary key check (slot between 1 and 8),
-  storage_path text not null,
-  updated_at timestamptz not null default now()
-);
-
 insert into public.app_settings (key, value)
 values ('deadline', '{"deadlineAt": null}'::jsonb)
 on conflict (key) do nothing;
@@ -93,15 +87,11 @@ alter table public.guinness_entries enable row level security;
 alter table public.architecture_entries enable row level security;
 alter table public.evaluations enable row level security;
 alter table public.app_settings enable row level security;
-alter table public.picture_round_images enable row level security;
 
 insert into storage.buckets (id, name, public)
 values ('team-uploads', 'team-uploads', false)
 on conflict (id) do nothing;
 
-insert into storage.buckets (id, name, public)
-values ('quiz-assets', 'quiz-assets', false)
-on conflict (id) do nothing;
 
 grant all on table public.teams to service_role;
 grant all on table public.station_progress to service_role;
@@ -111,4 +101,3 @@ grant all on table public.guinness_entries to service_role;
 grant all on table public.architecture_entries to service_role;
 grant all on table public.evaluations to service_role;
 grant all on table public.app_settings to service_role;
-grant all on table public.picture_round_images to service_role;

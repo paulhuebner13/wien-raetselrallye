@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { QuestionBlock, RallyeConfig } from '@/lib/types';
+import type { Question, QuestionBlock, RallyeConfig } from '@/lib/types';
 import { blockLabel, distributeBlocks } from '@/lib/config';
 import IntroModal from './IntroModal';
 import StationView from './StationView';
@@ -17,7 +17,6 @@ type TeamState = {
   beers: Array<{ id: string; brand: string; image_url: string | null }>;
   guinness: Array<{ id: string; street: string; image_url: string | null }>;
   architecture: Array<{ id: string; style: string; building_name: string; image_url: string | null }>;
-  pictureRoundImages: Array<{ slot: number; image_url: string | null }>;
   deadlineAt: string | null;
   locked: boolean;
   finalStationTitle: string;
@@ -25,10 +24,12 @@ type TeamState = {
 };
 
 type OpenItem = { type: 'station'; id: number } | { type: 'block'; id: string } | { type: 'review' } | null;
+type NodeState = 'done' | 'open' | 'locked';
 type PathNode =
-  | { key: string; kind: 'station'; label: string; stationId: number; state: 'done' | 'open' | 'locked' }
-  | { key: string; kind: 'block'; label: string; block: QuestionBlock; state: 'done' | 'open' | 'locked' }
-  | { key: string; kind: 'review'; label: string; state: 'open' | 'locked' };
+  | { key: string; kind: 'station'; label: string; stationId: number; state: NodeState }
+  | { key: string; kind: 'block'; label: string; block: QuestionBlock; state: NodeState }
+  | { key: string; kind: 'review'; label: string; state: 'open' | 'locked' }
+  | { key: string; kind: 'finish'; label: string; state: 'open' | 'locked' };
 
 type PathCell = PathNode | null;
 
@@ -39,6 +40,29 @@ function formatRemaining(ms: number) {
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
   return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
+}
+
+function parseList(value: string, count: number) {
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? Array.from({ length: count }, (_, i) => String(parsed[i] ?? '')) : Array(count).fill('');
+  } catch { return Array(count).fill(''); }
+}
+
+function parseMap(value: string) {
+  try { const parsed = JSON.parse(value); return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, string> : {}; }
+  catch { return {}; }
+}
+
+function questionComplete(q: Question, value: string) {
+  if (!value.trim()) return false;
+  if (q.type === 'picture_round') return parseList(value, q.images?.length ?? 8).every((v) => v.trim());
+  if (q.type === 'music_round') return parseList(value, q.tracks?.length ?? 2).every((v) => v.trim());
+  if (q.type === 'matching') {
+    const map = parseMap(value);
+    return (q.items ?? []).every((item) => String(map[item] ?? '').trim());
+  }
+  return true;
 }
 
 export default function RallyeApp({ config, blocks, teamName }: { config: RallyeConfig; blocks: QuestionBlock[]; teamName: string }) {
@@ -76,46 +100,30 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
     if (!state) return [];
     return state.stationOrder.map((id) => config.stations.find((s) => s.id === id)).filter(Boolean) as RallyeConfig['stations'];
   }, [state, config.stations]);
-
-  const regularStations = useMemo(() => orderedStations.filter((s) => s.id !== config.finalStationId), [orderedStations, config.finalStationId]);
-  const finalStation = useMemo(() => orderedStations.find((s) => s.id === config.finalStationId), [orderedStations, config.finalStationId]);
-  const groupedBlocks = useMemo(() => distributeBlocks(blocks, Math.max(1, regularStations.length)), [blocks, regularStations.length]);
+  const groupedBlocks = useMemo(() => distributeBlocks(blocks, Math.max(1, orderedStations.length)), [blocks, orderedStations.length]);
 
   const mainNodes = useMemo<PathNode[]>(() => {
     if (!state) return [];
     const out: PathNode[] = [];
-    regularStations.forEach((station, index) => {
+    orderedStations.forEach((station, index) => {
       const ss = state.stationStates.find((s) => s.stationId === station.id)!;
       out.push({ key: `s-${station.id}`, kind: 'station', label: `Station ${index + 1}`, stationId: station.id, state: ss.submitted ? 'done' : ss.unlocked ? 'open' : 'locked' });
       const blockUnlocked = ss.submitted;
       (groupedBlocks[index] ?? []).forEach((block) => {
-        const complete = block.questions.every((q) => (state.quiz[q.id] ?? '').trim());
+        const complete = block.questions.every((q) => questionComplete(q, state.quiz[q.id] ?? ''));
         out.push({ key: `b-${block.id}`, kind: 'block', label: blockLabel(block), block, state: complete ? 'done' : blockUnlocked ? 'open' : 'locked' });
       });
     });
     return out;
-  }, [state, regularStations, groupedBlocks]);
+  }, [state, orderedStations, groupedBlocks]);
 
   const rows = useMemo<PathCell[][]>(() => {
     if (!state) return [];
-
-    // Der Pfad ist eine einzige Schlange: oben links → oben rechts →
-    // rechts darunter → links daneben → links darunter → rechts daneben …
-    // Antworten prüfen kommt nach allen normalen Stationen/Fragen, Johnny's Pub ganz zuletzt.
-    const sequence: PathNode[] = [...mainNodes];
-    sequence.push({ key: 'review', kind: 'review', label: 'Antworten prüfen', state: state.reviewUnlocked ? 'open' : 'locked' });
-
-    if (finalStation) {
-      const fs = state.stationStates.find((s) => s.stationId === finalStation.id)!;
-      sequence.push({
-        key: `s-${finalStation.id}`,
-        kind: 'station',
-        label: finalStation.title,
-        stationId: finalStation.id,
-        state: fs.submitted ? 'done' : fs.unlocked ? 'open' : 'locked',
-      });
-    }
-
+    const sequence: PathNode[] = [
+      ...mainNodes,
+      { key: 'review', kind: 'review', label: 'Antworten prüfen', state: state.reviewUnlocked ? 'open' : 'locked' },
+      { key: 'finish', kind: 'finish', label: config.finish.title, state: state.reviewUnlocked ? 'open' : 'locked' },
+    ];
     const result: PathCell[][] = [];
     for (let i = 0; i < sequence.length; i += 2) {
       const pair: PathCell[] = sequence.slice(i, i + 2);
@@ -124,11 +132,11 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
       result.push(pair);
     }
     return result;
-  }, [state, mainNodes, finalStation]);
+  }, [state, mainNodes, config.finish.title]);
 
   async function logout() { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/'); router.refresh(); }
   function openNode(node: PathNode) {
-    if (node.state === 'locked') return;
+    if (node.state === 'locked' || node.kind === 'finish') return;
     if (node.kind === 'station') setOpen({ type: 'station', id: node.stationId });
     if (node.kind === 'block') setOpen({ type: 'block', id: node.block.id });
     if (node.kind === 'review') setOpen({ type: 'review' });
@@ -149,11 +157,17 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
     </div>
 
     <div className="content-area">
-      {tab === 'rallye' && <section className="path-wrap">{rows.map((row, rowIndex) => <div className="path-row" key={rowIndex}>
-        {row.map((node, cellIndex) => node ? <button key={node.key} className={`path-node ${node.kind} ${node.state}`} onClick={() => openNode(node)} disabled={node.state === 'locked'}>
-          <span className="node-icon">{node.kind === 'station' ? '●' : node.kind === 'block' ? '?' : '✓'}</span><span>{node.label}</span>
-        </button> : <div className="path-placeholder" key={`empty-${cellIndex}`} />)}
-      </div>)}</section>}
+      {tab === 'rallye' && <section className="path-wrap">{rows.map((row, rowIndex) => {
+        const single = row.filter(Boolean).length === 1;
+        return <div className={`path-row ${single ? 'single' : ''}`} key={rowIndex}>
+          {row.map((node, cellIndex) => node ? node.kind === 'finish'
+            ? <div key={node.key} className={`path-node finish ${node.state}`}><span className="node-icon">◆</span><span>{node.label}</span></div>
+            : <button key={node.key} className={`path-node ${node.kind} ${node.state}`} onClick={() => openNode(node)} disabled={node.state === 'locked'}>
+              <span className="node-icon">{node.kind === 'station' ? '●' : node.kind === 'block' ? '?' : '✓'}</span><span>{node.label}</span>
+            </button>
+            : <div className="path-placeholder" key={`empty-${cellIndex}`} />)}
+        </div>;
+      })}</section>}
       {tab === 'guinness' && <GuinnessTab entries={state.guinness} refresh={refresh} locked={localLocked} />}
       {tab === 'architecture' && <ArchitectureTab entries={state.architecture} styles={config.architectureStyles} refresh={refresh} locked={localLocked} />}
       {tab === 'beer' && <BeerTab beers={state.beers} refresh={refresh} locked={localLocked} />}
@@ -168,7 +182,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
 
     {showIntro && <IntroModal config={config} onClose={() => setShowIntro(false)} />}
     {openStation && openStationState && <div className="full-sheet"><StationView station={openStation} state={openStationState} onClose={() => setOpen(null)} refresh={refresh} locked={localLocked} /></div>}
-    {openBlock && <div className="full-sheet"><QuizBlock block={openBlock} answers={state.quiz} pictureRoundImages={state.pictureRoundImages} locked={localLocked} onClose={() => setOpen(null)} /></div>}
-    {open?.type === 'review' && <div className="full-sheet"><QuizBlock review allBlocks={blocks} answers={state.quiz} pictureRoundImages={state.pictureRoundImages} locked={localLocked} onClose={() => setOpen(null)} /></div>}
+    {openBlock && <div className="full-sheet"><QuizBlock block={openBlock} answers={state.quiz} locked={localLocked} onClose={() => setOpen(null)} /></div>}
+    {open?.type === 'review' && <div className="full-sheet"><QuizBlock review allBlocks={blocks} answers={state.quiz} locked={localLocked} onClose={() => setOpen(null)} /></div>}
   </main>;
 }

@@ -16,7 +16,11 @@ export type Question = {
   id: string;
   category: string;
   text: string;
-  type?: 'text' | 'textarea' | 'picture_round';
+  type?: 'text' | 'textarea' | 'picture_round' | 'matching' | 'music_round';
+  images?: string[];
+  items?: string[];
+  options?: string[];
+  tracks?: Array<{ label: string; src: string }>;
 };
 
 export type QuestionBlock = {
@@ -27,7 +31,9 @@ export type QuestionBlock = {
 
 export type RallyeConfig = {
   stationCount: number;
-  finalStationId: number;
+  finish: {
+    title: string;
+  };
   intro: {
     title: string;
     body: string[];

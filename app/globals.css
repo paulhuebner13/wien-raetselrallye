@@ -217,3 +217,32 @@ html, body { background: var(--bg); }
 .result-card > div { display: flex; justify-content: space-between; gap: 12px; align-items: end; }
 .result-card strong { font-size: 27px; color: var(--brown-dark); }
 .result-card p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+/* v4: durchgehender Schlangenpfad, ohne Linie nach dem Endpunkt */
+.path-row.single::before { display: none; }
+.path-node.finish { background: var(--brown-dark); border-color: var(--brown-dark); color: #fffaf1; cursor: default; }
+.path-node.finish.locked { background: var(--gray) !important; border-color: transparent; color: #8a7e72; }
+
+/* Strukturierte Quizfragen */
+.picture-round-item { display: grid; }
+.picture-round-item input { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: #fffaf1; }
+.matching-grid { display: grid; gap: 8px; margin-top: 4px; }
+.matching-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.matching-row:last-child { border-bottom: 0; }
+.matching-row > span { font-size: 15px; }
+.music-round-list { display: grid; gap: 14px; margin-top: 4px; }
+.music-round-item { background: var(--cream); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.music-round-item audio { width: 100%; max-width: 100%; }
+.special-question-row { grid-template-columns: 1fr; }
+.special-eval-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 100%; }
+.special-eval-item { display: grid; gap: 7px; border: 1px solid var(--line); border-radius: 12px; padding: 9px; background: var(--cream); min-width: 0; }
+.special-eval-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: white; border-radius: 8px; }
+.special-eval-item audio { width: 100%; }
+.special-score { grid-column: 1 / -1; padding-top: 4px; color: var(--brown-dark); }
+.music-admin-grid { grid-template-columns: 1fr 1fr; }
+.matching-admin-answer > div { display: grid; gap: 5px; }
+
+@media (max-width: 600px) {
+  .matching-row { grid-template-columns: minmax(0, 1fr) 96px; }
+  .special-eval-grid, .music-admin-grid { grid-template-columns: 1fr 1fr; }
+}

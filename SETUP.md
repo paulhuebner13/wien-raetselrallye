@@ -53,8 +53,8 @@ Datei: `config/stations.json`
 
 Wichtig:
 - `stationCount` = Anzahl der Stationen
-- `finalStationId` = Johnny's / gemeinsame Finalstation
-- die Finalstation muss bei jeder Team-Reihenfolge zuletzt stehen
+- `finish.title` = Name des Endpunkts, aktuell Johnny's Pub
+- Johnny's Pub ist kein Teil der Stations-Reihenfolge
 
 Stationsbilder liegen unter `public/stations/...`.
 
@@ -99,7 +99,11 @@ Die Blöcke bleiben zusammen und werden automatisch möglichst gleichmäßig zwi
 
 ### Picture Round
 
-Die 8 Länderbilder lädst du direkt im **Admin → Picture Round** hoch. Du musst sie nicht in GitHub kopieren.
+Die 8 Länderbilder liegen in GitHub unter `public/picture-round/1.jpg` bis `8.jpg`. Ersetze diese Dateien durch deine eigenen Länderumrisse.
+
+### Music Round
+
+Die beiden Audiodateien liegen unter `public/music-round/1.mp3` und `2.mp3`. Ersetze sie durch deine eigenen MP3s.
 
 ## 6. Punkte
 
@@ -116,7 +120,7 @@ Beispiel:
 
 ```json
 {
-  "stationTaskPoints": { "1": 5, "2": 5, "3": 5 },
+  "stationTaskPoints": { "1": 5, "2": 5, "3": 5, "4": 5 },
   "questionPoints": { "geo-neighbours": 2 },
   "guinnessPerLogo": 1,
   "architecturePerStyle": 1,
@@ -141,22 +145,21 @@ Im Admin kannst du:
 - Teams hinzufügen/löschen
 - Deadline laufend ändern
 - Stations-Reihenfolge pro Team festlegen
-- 8 Picture-Round-Bilder hochladen
 - Teams auslosen
 - Paare definieren, die zusammen sein müssen
 - Paare definieren, die nicht zusammen sein dürfen
 - Antworten prüfen
 - Stationsantworten zurücksetzen
-- Vor-Ort-% vergeben
+- Quiz-, Stations- und Challenge-Einträge bewerten
 
 Stations-Reihenfolge z. B.:
 
 ```text
-Team A: 1, 2, 3
-Team B: 2, 1, 3
+Team A: 1, 2, 3, 4
+Team B: 3, 1, 4, 2
 ```
 
-Die Finalstation muss immer zuletzt bleiben.
+Johnny's Pub gehört nicht zur Stations-Reihenfolge. Trage nur die normalen Stations-IDs ein.
 
 ## 9. Challenges
 
@@ -164,7 +167,6 @@ Die Finalstation muss immer zuletzt bleiben.
 - beliebig viele Uploads
 - verschiedene Pubs
 - Harfe + Guinness-Schriftzug sichtbar
-- mindestens 3
 
 ### Architektur
 - 1 Foto pro Stil

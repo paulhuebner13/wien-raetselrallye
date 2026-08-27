@@ -4,7 +4,22 @@
       "id": "block-1",
       "categories": ["Picture Round", "Geographie"],
       "questions": [
-        {"id":"picture-round","category":"Picture Round","text":"Welche 8 Länder sind abgebildet? Schreibt die Ländernamen in der Reihenfolge 1–8.","type":"picture_round"},
+        {
+          "id": "picture-round",
+          "category": "Picture Round",
+          "text": "Welche 8 Länder sind abgebildet?",
+          "type": "picture_round",
+          "images": [
+            "/picture-round/1.jpg",
+            "/picture-round/2.jpg",
+            "/picture-round/3.jpg",
+            "/picture-round/4.jpg",
+            "/picture-round/5.jpg",
+            "/picture-round/6.jpg",
+            "/picture-round/7.jpg",
+            "/picture-round/8.jpg"
+          ]
+        },
         {"id":"geo-neighbours","category":"Geographie","text":"Zählt alle Länder auf, die eine Landgrenze mit Österreich haben."},
         {"id":"geo-flags","category":"Geographie","text":"Welche Farbe kommt als einzige in den Flaggen von Brasilien, Sudan, Litauen und Aserbaidschan vor? Schwarz und Weiß zählen als Farben."}
       ]
@@ -24,7 +39,14 @@
       "categories": ["Politik", "Sport", "Natur / Allgemeinwissen"],
       "questions": [
         {"id":"politics-2","category":"Politik","text":"Politikfrage 2 – hier ersetzen."},
-        {"id":"sport-1","category":"Sport","text":"Sportfrage – hier ersetzen."},
+        {
+          "id":"sport-founded",
+          "category":"Sport",
+          "text":"Ordnet diese Fußballclubs den Gründungsjahren zu. (1899, 1911, 1912, 1930)",
+          "type":"matching",
+          "items":["SV Ried","Austria Wien","Rapid Wien","WSG Tirol"],
+          "options":["1899","1911","1912","1930"]
+        },
         {"id":"nature-lizard","category":"Natur / Allgemeinwissen","text":"Welche ist die größte noch lebende Echse?"}
       ]
     },
@@ -55,12 +77,21 @@
     },
     {
       "id": "block-6",
-      "categories": ["Song / Musik", "Lyrics", "Song vorgespielt"],
+      "categories": ["Song / Musik", "Lyrics", "Music Round"],
       "questions": [
         {"id":"music-1","category":"Song / Musik","text":"Musikfrage 1 – hier ersetzen."},
         {"id":"music-2","category":"Song / Musik","text":"Musikfrage 2 – hier ersetzen."},
         {"id":"lyrics-1","category":"Lyrics","text":"Lyrics-Frage – hier ersetzen."},
-        {"id":"played-song","category":"Song vorgespielt","text":"Welcher Song wird vorgespielt?"}
+        {
+          "id":"music-round",
+          "category":"Music Round",
+          "text":"Hört euch beide Songs an und tragt jeweils den Titel ein.",
+          "type":"music_round",
+          "tracks":[
+            {"label":"Song 1","src":"/music-round/1.mp3"},
+            {"label":"Song 2","src":"/music-round/2.mp3"}
+          ]
+        }
       ]
     }
   ]
