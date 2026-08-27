@@ -43,7 +43,7 @@
     {
       "id": 1,
       "title": "Station 1",
-      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "text": "Im Norden findet sich ein steinerner Hinweis auf „hochherzige Spender“. Auf welches Datum ist dieser datiert?",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
@@ -58,7 +58,7 @@
     {
       "id": 2,
       "title": "Station 2",
-      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "text": "Wann wurde das Wiener Unterkammeramt hierher verlegt?",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
@@ -73,7 +73,7 @@
     {
       "id": 3,
       "title": "Station 3",
-      "text": "Findet vor Ort den gesuchten Hinweis und tragt die Lösung ein.",
+      "text": "Amsterdam und Venedig sind berühmt dafür – aber wie viele davon lassen sich hier finden? (Ränder zählen nicht)",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
