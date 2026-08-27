@@ -9,6 +9,7 @@ import IntroModal from './IntroModal';
 import StationView from './StationView';
 import QuizBlock from './QuizBlock';
 import { ArchitectureTab, BeerTab, GuinnessTab } from './ChallengeTabs';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 type BlockState = { timerEnabled: boolean; startedAt: string | null; expiresAt: string | null; durationMinutes: number };
 type TeamState = {
@@ -131,7 +132,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
     if (node.kind === 'review') setOpen({ type: 'review' });
   }
 
-  if (!state) return <main className="loading-screen">{error || 'Lädt…'}</main>;
+  if (!state) return <main className="loading-screen">{error ? error : <div className="screen-loading"><LoadingSpinner /><span>Lädt…</span></div>}</main>;
   const openStation = open?.type === 'station' ? config.stations.find((s) => s.id === open.id) : undefined;
   const openStationState = openStation ? state.stationStates.find((s) => s.stationId === openStation.id) : undefined;
   const openBlock = open?.type === 'block' ? blocks.find((b) => b.id === open.id) : undefined;

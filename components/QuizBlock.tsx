@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '@/components/Modal';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { blockLabel, questionMaxPoints } from '@/lib/config';
 import type { Question, QuestionBlock, ScoringConfig } from '@/lib/types';
 import type { MusicRoundSettings } from '@/lib/music-round-settings';
@@ -80,7 +81,7 @@ export default function QuizBlock({ block, blockState, answers, onClose, onStart
         <p>Ihr habt {durationMinutes} Minuten Zeit.</p>
         <p className="muted">Nach Ablauf der Zeit sind die Antworten gesperrt.</p>
         {startError && <p className="error-text">{startError}</p>}
-        <button className="primary full" onClick={startBlock} disabled={starting || locked}>{starting ? 'Startet…' : 'Los'}</button>
+        <button className="primary full" onClick={startBlock} disabled={starting || locked}>{starting ? <><LoadingSpinner small /> Startet…</> : 'Los'}</button>
         {locked && <p className="error-text">Zeit abgelaufen.</p>}
       </div>
     </div>;
@@ -92,7 +93,7 @@ export default function QuizBlock({ block, blockState, answers, onClose, onStart
       <div>
         <div className="eyebrow">{review ? 'CHECK' : 'FRAGENBLOCK'}</div>
         <h2>{review ? 'Antworten prüfen' : block ? blockLabel(block) : 'Fragen'}</h2>
-        <p className="muted">{review ? (reviewEditable ? 'Antworten können bis zum Gesamt-Zeitlimit geändert werden.' : 'Antworten sind nur noch lesbar.') : blockLocked ? 'Zeit abgelaufen. Antworten sind gesperrt.' : timerEnabled ? 'Antworten werden automatisch gespeichert.' : 'Kein Blocktimer. Antworten bleiben bis zum Gesamt-Zeitlimit bearbeitbar.'}</p>
+        <p className="muted">{review ? (reviewEditable ? 'Antworten können bis zum Gesamt-Zeitlimit geändert werden.' : 'Antworten sind nur noch lesbar.') : blockLocked ? 'Zeit abgelaufen. Antworten sind gesperrt.' : 'Antworten werden automatisch gespeichert.'}</p>
       </div>
       <button className="icon-button" onClick={onClose}>×</button>
     </div>
@@ -206,7 +207,7 @@ function parseMap(raw: string) {
 }
 
 function SaveState({ status }: { status: 'idle' | 'saving' | 'saved' | 'error' }) {
-  return <span className="save-state">{status === 'saving' ? 'Speichert…' : status === 'saved' ? 'Gespeichert' : status === 'error' ? 'Fehler' : ''}</span>;
+  return <span className="save-state">{status === 'saving' ? <><LoadingSpinner small /> Speichert…</> : status === 'saved' ? 'Gespeichert' : status === 'error' ? 'Fehler' : ''}</span>;
 }
 
 function QuestionHeader({ question, scoring }: { question: Question; scoring: ScoringConfig }) {
@@ -494,7 +495,7 @@ function MusicTrackCard({ track, index, answer, stage, durations, stagePoints, l
     />
     <div className="music-preview-controls">
       <button type="button" className="primary" onClick={() => playing ? stop() : play()}>{playing ? 'Stopp' : `${currentDuration}s anhören`}</button>
-      {stage < 4 && <button type="button" className="secondary" disabled={locked || revealing} onClick={more}>{revealing ? 'Öffnet…' : `Mehr hören: ${durations[stage]}s · danach max. ${String(stagePoints[stage] ?? 0).replace('.', ',')} P.`}</button>}
+      {stage < 4 && <button type="button" className="secondary" disabled={locked || revealing} onClick={more}>{revealing ? <><LoadingSpinner small /> Öffnet…</> : `Mehr hören: ${durations[stage]}s · danach max. ${String(stagePoints[stage] ?? 0).replace('.', ',')} P.`}</button>}
     </div>
     <div className="music-progress" aria-hidden="true"><span style={{ width: `${Math.min(100, currentDuration > 0 ? (elapsed / currentDuration) * 100 : 0)}%` }} /></div>
     <input type="text" placeholder="Songtitel" value={answer} disabled={locked} onChange={(e) => onAnswer(e.target.value)} onBlur={() => { void onAnswerBlur(); }} />

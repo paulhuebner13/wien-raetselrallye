@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { RallyeConfig, ScoringConfig } from '@/lib/types';
 import { supabaseBrowser } from '@/lib/supabase-browser';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 type GuinnessEntry = { id: string; street: string; image_url: string | null };
 type ArchitectureEntry = { id: string; style: string; building_name: string; image_url: string | null };
@@ -65,7 +66,7 @@ export function GuinnessTab({ entries, refresh, locked, scoring }: { entries: Gu
       <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input id="guinness-file" type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
       <label>Straße<input value={street} disabled={busy} onChange={(e) => setStreet(e.target.value)} /></label>
-      <button className="primary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
+      <button className="primary" disabled={busy}>{busy ? <><LoadingSpinner small /> Wird hochgeladen…</> : 'Hochladen'}</button>
       {error && <p className="error-text">{error}</p>}
     </form>}
     {locked && <div className="locked-notice">Zeit abgelaufen.</div>}
@@ -126,7 +127,7 @@ function ArchitectureStyle({ style, entry, refresh, locked }: { style: RallyeCon
       <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
       <label>Gebäudename<input value={name} disabled={busy} onChange={(e) => setName(e.target.value)} /></label>
-      <button className="secondary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
+      <button className="secondary" disabled={busy}>{busy ? <><LoadingSpinner small /> Wird hochgeladen…</> : 'Hochladen'}</button>
       {error && <p className="error-text">{error}</p>}
     </form> : <div className="locked-notice">Zeit abgelaufen.</div>}
   </article>;
@@ -175,7 +176,7 @@ export function BeerTab({ beers, refresh, locked, scoring }: { beers: Beer[]; re
       <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input id="beer-file" type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
       <label>Bier<input value={brand} disabled={busy} onChange={(e) => setBrand(e.target.value)} placeholder="z. B. Stiegl Goldbräu" /></label>
-      <button className="primary" disabled={busy}>{busy ? 'Lädt…' : 'Hochladen'}</button>
+      <button className="primary" disabled={busy}>{busy ? <><LoadingSpinner small /> Wird hochgeladen…</> : 'Hochladen'}</button>
       {error && <p className="error-text">{error}</p>}
     </form>}
     {locked && <div className="locked-notice">Zeit abgelaufen.</div>}

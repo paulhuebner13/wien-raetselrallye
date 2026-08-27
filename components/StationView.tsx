@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Modal from '@/components/Modal';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import type { StationConfig } from '@/lib/types';
 
 type StationState = {
@@ -15,6 +16,7 @@ export default function StationView({ station, state, onClose, refresh, locked }
   const [imageIndex, setImageIndex] = useState(0);
   const [answer, setAnswer] = useState(state.answer ?? '');
   const [busy, setBusy] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
   const [error, setError] = useState('');
   const [confirmAction, setConfirmAction] = useState<'hint' | 'submit' | null>(null);
   const touchStart = useRef<number | null>(null);
@@ -26,10 +28,10 @@ export default function StationView({ station, state, onClose, refresh, locked }
   async function nextHint() {
     if (locked || state.hintPoints <= 0 || state.submitted) return;
     setConfirmAction(null);
-    setBusy(true); setError('');
+    setBusy(true); setImageLoading(true); setError('');
     const res = await fetch('/api/team/station-hint', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stationId: station.id }) });
     setBusy(false);
-    if (!res.ok) return setError((await res.json()).error ?? 'Fehler.');
+    if (!res.ok) { setImageLoading(false); return setError((await res.json()).error ?? 'Fehler.'); }
     await refresh(); setImageIndex(Math.min(maxIndex + 1, station.images.length - 1));
   }
 
@@ -47,18 +49,26 @@ export default function StationView({ station, state, onClose, refresh, locked }
   function swipeEnd(x: number) {
     if (touchStart.current === null) return;
     const d = x - touchStart.current;
-    if (d < -40 && imageIndex < maxIndex) setImageIndex((v) => v + 1);
-    if (d > 40 && imageIndex > 0) setImageIndex((v) => v - 1);
+    if (d < -40 && imageIndex < maxIndex) { setImageLoading(true); setImageIndex((v) => v + 1); }
+    if (d > 40 && imageIndex > 0) { setImageLoading(true); setImageIndex((v) => v - 1); }
     touchStart.current = null;
   }
 
   return <div className="sheet-page">
     <div className="sheet-head"><div><div className="eyebrow">STATION</div><h2>{station.title}</h2></div><button className="icon-button" onClick={onClose}>×</button></div>
     <div className="points-pill">{state.hintPoints} Hinweispunkte</div>
+    {busy && <div className="action-loading"><LoadingSpinner small /><span>Wird geladen…</span></div>}
     <div className="station-image-wrap" onTouchStart={(e) => touchStart.current = e.touches[0].clientX} onTouchEnd={(e) => swipeEnd(e.changedTouches[0].clientX)}>
-      <img className="station-image" src={station.images[imageIndex]} alt={`Hinweis ${imageIndex + 1}`} />
-      <button className="image-arrow left" onClick={() => setImageIndex((v) => Math.max(0, v - 1))} disabled={imageIndex === 0}>‹</button>
-      <button className="image-arrow right" onClick={() => setImageIndex((v) => Math.min(maxIndex, v + 1))} disabled={imageIndex === maxIndex}>›</button>
+      <img
+        className={`station-image${imageLoading ? ' loading' : ''}`}
+        src={station.images[imageIndex]}
+        alt={`Hinweis ${imageIndex + 1}`}
+        onLoad={() => setImageLoading(false)}
+        onError={() => { setImageLoading(false); setError('Bild konnte nicht geladen werden. Seite neu laden.'); }}
+      />
+      {imageLoading && <div className="image-loading-overlay"><LoadingSpinner /><span>Bild wird geladen…</span></div>}
+      <button className="image-arrow left" onClick={() => { setImageLoading(true); setImageIndex((v) => Math.max(0, v - 1)); }} disabled={imageIndex === 0 || imageLoading}>‹</button>
+      <button className="image-arrow right" onClick={() => { setImageLoading(true); setImageIndex((v) => Math.min(maxIndex, v + 1)); }} disabled={imageIndex === maxIndex || imageLoading}>›</button>
     </div>
     <div className="image-dots">{Array.from({ length: maxIndex + 1 }).map((_, i) => <button key={i} className={i === imageIndex ? 'active' : ''} onClick={() => setImageIndex(i)} aria-label={`Hinweis ${i + 1}`} />)}</div>
     {!locked && !state.submitted && state.hintPoints > 0 && <button className="secondary full" onClick={() => setConfirmAction('hint')} disabled={busy}>Nächster Hinweis · -1 Punkt</button>}
