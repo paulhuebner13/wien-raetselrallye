@@ -145,7 +145,7 @@
     {
       "id": "sport-london-marathon-2026",
       "category": "Sport",
-      "text": "Beim London Marathon 2026 wurde erstmals die Zwei-Stunden-Marke in einem offiziellen Marathon unterboten. Wie heißt der Läufer, der dabei den Weltrekord aufstellte?"
+      "text": "Beim London Marathon 2026 wurde erstmals die Zwei-Stunden-Marke in einem offiziellen Marathon unterboten. Wie heißt der Läufer, der dabei den neuen Weltrekord aufstellte?"
     },
     {
       "id": "nature-lizard",
@@ -160,17 +160,17 @@
     {
       "id": "bonus-alcohol",
       "category": "Bonusfrage",
-      "text": "Wie viele Liter reinen Alkohol wurden in Österreich laut OECD 2024 durchschnittlich pro Person ab 15 Jahren konsumiert?"
+      "text": "Wie viele Liter reinen Alkohol wurden in Österreich laut OECD 2024 durchschnittlich pro Person (ab 15 Jahren) konsumiert?"
     },
     {
       "id": "literature-sherlock",
       "category": "Literatur",
-      "text": "Wie lautet die vollständige Adresse von Sherlock Holmes? Straße allein reicht nicht."
+      "text": "Wie lautet die vollständige Adresse von Sherlock Holmes? (Straße allein reicht nicht.)"
     },
     {
       "id": "art-kiss",
       "category": "Kunst",
-      "text": "In welchem Wiener Museum ist Gustav Klimts Gemälde „Der Kuss“ ausgestellt?"
+      "text": "In welchem Museum ist Gustav Klimts Gemälde „Der Kuss“ ausgestellt?"
     },
     {
       "id": "computer-gta-v",
@@ -185,7 +185,7 @@
     {
       "id": "film-got-continent",
       "category": "Film",
-      "text": "Wie heißt der Kontinent östlich von Westeros in der Welt von „Game of Thrones“?"
+      "text": "Wie heißt der Kontinent östlich von Westeros in „Game of Thrones“?"
     },
     {
       "id": "film-parasite-oscar",
@@ -205,7 +205,7 @@
     {
       "id": "songs-wonderwall-lyrics",
       "category": "Songs",
-      "text": "„Maybe, you're gonna be the one that saves me“ – wie heißen Song und Interpret?"
+      "text": "Wie lauten Titel und Interpret dieses Songs: „Maybe, you're gonna be the one that saves me“?"
     },
     {
       "id": "music-round",

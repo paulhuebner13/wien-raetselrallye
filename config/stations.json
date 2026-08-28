@@ -2,16 +2,15 @@
   "intro": {
     "title": "Rätselrallye",
     "body": [
-      "Sucht die Orte mittels der Hinweise und findet dort die Antworten auf die Fragen.",
-      "Die Hinweise zeigen den gesuchten Bereich. Gemeint ist nicht nur der exakte Aufnahmeort oder das Motiv, sondern der größere, aber klar abgegrenzte Bereich.",
+      "Sucht die Orte mittels der Hinweise und findet dort die Antworten auf die gestellten Fragen.",
+      "Die Hinweise zeigen den gesuchten Bereich (Gebäude, Park, Platz, etc.). Gemeint ist also nicht nur der exakte Aufnahmeort oder das Motiv, sondern der größere, aber klar abgegrenzte Bereich.",
       "Bis zum Ablauf des Timers müsst ihr im Johnny's Pub sein. Danach sind keine Änderungen mehr möglich.",
       "Das Laden und Hochladen von Bildern kann etwas dauern. Sollte etwas nicht funktionieren, versucht die Seite neu zu laden."
     ],
     "phoneRules": [
-      "Handys nur für diese Website, Antworten und Fotos.",
-      "Fotos direkt in der App machen.",
-      "Kein Google, keine KI, keine anderen Webseiten oder Apps.",
-      "Keine digitale Navigation. Nur der mitgegebene Stadtplan ist erlaubt."
+      "Handys nur für diese Website, Antworten und Fotos verwenden.",
+      "Fotos müssen direkt in der App gemacht werden.",
+      "Keine google/apple maps. Nur der mitgegebene Stadtplan ist erlaubt."
     ]
   },
   "stationCount": 4,
@@ -21,23 +20,23 @@
   "architectureStyles": [
     {
       "name": "Gotik",
-      "description": "Die Gotik entwickelte sich ab der Mitte des 12. Jahrhunderts in Frankreich und prägte die europäische Architektur bis in die frühe Neuzeit. Typisch sind Spitzbögen, Kreuzrippengewölbe, Strebepfeiler und große Fensterflächen. Die Konstruktion verlagert tragende Kräfte stärker nach außen, wodurch hohe, lichtreiche Innenräume und eine starke Betonung der Vertikalen möglich werden. Erkennen kann man gotische Bauten besonders an Spitzbögen, Maßwerk und dem aufwärtsstrebenden Eindruck; gegenüber der Romanik wirken sie meist leichter und stärker durchfenstert."
+      "description": "Die Gotik entstand im 12. Jahrhundert in Frankreich und prägte die europäische Architektur bis in die frühe Neuzeit. Typisch sind Spitzbögen, Kreuzrippengewölbe, Maßwerk, Strebepfeiler und eine starke Betonung der Vertikalen. Besonders Kirchen wirken dadurch hoch, schlank und stark nach oben orientiert. Von der Romanik unterscheidet sich die Gotik vor allem durch Spitzbögen und größere Fensterflächen. Werden gotische Formen an einem deutlich jüngeren Gebäude des 19. Jahrhunderts verwendet, handelt es sich meist um Neogotik und damit um Historismus."
     },
     {
       "name": "Barock",
-      "description": "Die Barockarchitektur entstand im 17. Jahrhundert in Italien und verbreitete sich anschließend in weiten Teilen Europas. Typisch sind reich geschmückte Fassaden, Säulen und Pilaster, Giebel, Kuppeln sowie eine starke Betonung der Gebäudemitte. Im Verlauf des Barock wurden Formen häufig bewegter und geschwungener, etwa durch konkave und konvexe Fassadenteile, während Licht und Dekoration gezielt für eine repräsentative Wirkung eingesetzt wurden. Erkennen kann man Barock daher an seiner Pracht, Bewegung und starken Inszenierung; gegenüber dem Klassizismus wirkt er meist verspielter und weniger streng."
+      "description": "Der Barock verbreitete sich ab dem 17. Jahrhundert von Italien aus in Europa. Charakteristisch sind stark gegliederte und reich dekorierte Fassaden, Säulen und Pilaster, Kuppeln, Statuen sowie häufig geschwungene oder vor- und zurückspringende Bauteile. Die Architektur wirkt bewusst repräsentativ und inszeniert Bewegung und räumliche Tiefe. Gegenüber dem Klassizismus ist Barock meist deutlich dekorativer und weniger streng aufgebaut. In Wien findet man ihn besonders häufig bei Kirchen, Palais und repräsentativen Bauten des 17. und 18. Jahrhunderts."
     },
     {
       "name": "Jugendstil",
-      "description": "Der Jugendstil entstand gegen Ende des 19. Jahrhunderts und war ungefähr von den 1890er-Jahren bis um 1910 besonders prägend. Kennzeichnend sind dekorativ geschwungene Linien und florale Ornamente, in Wien aber auch geometrische, reduzierte und modernere Formen. Ein zentrales Ziel war die Abkehr vom Historismus, also von der bloßen Nachahmung älterer Baustile, und die Suche nach einer eigenen Formensprache der Gegenwart. Erkennen kann man Jugendstil häufig an Pflanzenmotiven, ornamentalen Fassaden, charakteristischen Schrift- und Metallarbeiten oder klaren geometrischen Dekorationen."
+      "description": "Der Jugendstil entstand gegen Ende des 19. Jahrhunderts und war besonders um 1900 verbreitet. Typisch sind florale Ornamente, geschwungene Linien, dekorative Metallarbeiten und eine enge Verbindung von Architektur und Gestaltung. Der Wiener Jugendstil verwendet daneben häufig geometrische Muster, klare Flächen und stärker reduzierte Formen. Entscheidend ist die Abkehr von der Nachahmung historischer Baustile. Dadurch lässt er sich vom Historismus unterscheiden, der bewusst auf ältere Formen wie Gotik, Renaissance oder Barock zurückgreift."
     },
     {
       "name": "Klassizismus",
-      "description": "Der Klassizismus prägte die Architektur vor allem vom späten 18. bis in die erste Hälfte des 19. Jahrhunderts und orientierte sich bewusst an der griechischen und römischen Antike. Häufig verwendet werden Säulenordnungen, Portiken, Dreiecksgiebel und andere Formen, die an antike Tempel erinnern. Die Gestaltung wirkt meist klar, ruhig, ausgewogen und deutlich weniger verspielt als im Barock. Erkennen kann man klassizistische Gebäude daher besonders an ihrer antiken Formensprache, regelmäßigen Gliederung und zurückhaltenden Dekoration."
+      "description": "Der Klassizismus entwickelte sich im späten 18. Jahrhundert und orientierte sich an der Architektur der griechischen und römischen Antike. Typisch sind klare Symmetrie, Säulenordnungen, Portiken, Dreiecksgiebel und eine regelmäßige Fassadengliederung. Die Gestaltung wirkt meist ruhig, monumental und vergleichsweise zurückhaltend. Gegenüber dem Barock fehlen weitgehend geschwungene Formen und üppiger Dekor. Besonders charakteristisch ist die bewusste Anlehnung an antike Tempelarchitektur."
     },
     {
       "name": "Historismus",
-      "description": "Der Historismus war vor allem in der zweiten Hälfte des 19. Jahrhunderts bis zum frühen 20. Jahrhundert verbreitet und griff bewusst auf Baustile früherer Epochen zurück. Dazu gehören etwa Neogotik, Neorenaissance und Neobarock, wobei manchmal auch mehrere historische Stile in einem Gebäude kombiniert wurden. Deshalb besitzt der Historismus keine einzige typische Formensprache, sondern erkennt sich vor allem an der bewussten Wiederaufnahme älterer Architekturformen. Vom Jugendstil unterscheidet er sich gerade dadurch, dass er historische Vorbilder zitiert, während der Jugendstil eine neue, zeitgemäße Gestaltung suchte."
+      "description": "Der Historismus war vor allem in der zweiten Hälfte des 19. Jahrhunderts verbreitet und prägt große Teile der Wiener Ringstraßenarchitektur. Dabei wurden Baustile vergangener Epochen bewusst wiederaufgenommen, etwa als Neogotik, Neorenaissance oder Neobarock. Historismus besitzt deshalb keine einheitliche Formensprache; entscheidend ist die erkennbare Verwendung älterer Stilformen an einem jüngeren Gebäude. Häufig treten reicher Fassadenschmuck, Säulen, Bögen, Kuppeln oder andere historische Motive auf. Vom Jugendstil unterscheidet er sich vor allem dadurch, dass er historische Vorbilder zitiert, anstatt eine neue Formensprache zu entwickeln."
     }
   ],
   "stations": [
@@ -74,7 +73,7 @@
     {
       "id": 3,
       "title": "Station 3",
-      "text": "Amsterdam und Venedig sind dafür berühmt – aber wie viele davon lassen sich hier (im Inneren) finden?",
+      "text": "Amsterdam und Venedig sind dafür berühmt – aber wie viele davon lassen sich hier (im Inneren des Parks) finden?",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
@@ -89,7 +88,7 @@
     {
       "id": 4,
       "title": "Station 4",
-      "text": "Insgesamt sind es vier, doch einer ist stabiler als die anderen. Wie heißt er?",
+      "text": "Insgesamt sind es vier, doch einer ist stabiler als die anderen. Welchen Namen trägt er?",
       "answerLabel": "Lösung",
       "taskPoints": 5,
       "images": [
