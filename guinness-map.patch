@@ -1,0 +1,66 @@
+diff --git a/components/ChallengeTabs.tsx b/components/ChallengeTabs.tsx
+--- a/components/ChallengeTabs.tsx
++++ b/components/ChallengeTabs.tsx
+@@
+   const [street, setStreet] = useState('');
+   const [busy, setBusy] = useState(false);
+   const [error, setError] = useState('');
++  const [mapOpen, setMapOpen] = useState(false);
++  const [mapZoom, setMapZoom] = useState(1);
+@@
+     <div className="rule-box">
+       <b>Regeln</b>
+       <p>Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren. Harfe + Guinness-Schriftzug müssen sichtbar sein.</p>
+       <p>Jedes gültige Foto: {scoring.guinnessPerLogo} Punkt{scoring.guinnessPerLogo === 1 ? '' : 'e'}.</p>
+     </div>
++    <div className="guinness-map-card">
++      <p>Die Karte zeigt Suchergebnisse für „Irish Pub“ bei Google Maps und dient nur als Orientierung. Das bedeutet nicht, dass bei jedem eingezeichneten Pub auch ein Guinness-Logo zu finden ist.</p>
++      <button
++        type="button"
++        className="guinness-map-preview"
++        onClick={() => { setMapZoom(1); setMapOpen(true); }}
++        aria-label="Karte vergrößern"
++      >
++        <img src="/guinness-map.png" alt="Karte mit Suchergebnissen für Irish Pubs" />
++        <span>Zum Vergrößern antippen</span>
++      </button>
++    </div>
++    {mapOpen && <div
++      className="guinness-map-overlay"
++      role="dialog"
++      aria-modal="true"
++      aria-label="Irish-Pub-Karte"
++      onClick={() => setMapOpen(false)}
++    >
++      <div className="guinness-map-toolbar" onClick={(e) => e.stopPropagation()}>
++        <button type="button" onClick={() => setMapZoom((z) => Math.max(1, z - 0.5))}>−</button>
++        <span>{Math.round(mapZoom * 100)}%</span>
++        <button type="button" onClick={() => setMapZoom((z) => Math.min(4, z + 0.5))}>+</button>
++        <button type="button" onClick={() => setMapOpen(false)} aria-label="Schließen">×</button>
++      </div>
++      <div className="guinness-map-viewport" onClick={(e) => e.stopPropagation()}>
++        <img
++          src="/guinness-map.png"
++          alt="Karte mit Suchergebnissen für Irish Pubs"
++          className="guinness-map-full"
++          style={{ width: `${mapZoom * 100}%` }}
++          draggable={false}
++        />
++      </div>
++    </div>}
+     {!locked && <form className="upload-form" onSubmit={add}>
+diff --git a/app/globals.css b/app/globals.css
+--- a/app/globals.css
++++ b/app/globals.css
+@@
++.guinness-map-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 13px 14px; margin: 0 0 18px; }
++.guinness-map-card p { margin: 0 0 10px; line-height: 1.4; font-size: 13px; color: var(--muted); }
++.guinness-map-preview { width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #f7f7f4; position: relative; display: block; }
++.guinness-map-preview img { width: 100%; max-height: 340px; object-fit: cover; display: block; }
++.guinness-map-preview span { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); white-space: nowrap; background: rgba(0,0,0,.72); color: #fff; border-radius: 999px; padding: 7px 11px; font-size: 12px; font-weight: 800; }
++.guinness-map-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.88); display: grid; grid-template-rows: auto 1fr; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
++.guinness-map-toolbar { display: flex; justify-content: center; align-items: center; gap: 8px; padding-bottom: 10px; color: #fff; font-weight: 800; }
++.guinness-map-toolbar button { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #fff; color: #171714; font-size: 22px; font-weight: 900; }
++.guinness-map-toolbar span { min-width: 58px; text-align: center; }
++.guinness-map-viewport { overflow: auto; overscroll-behavior: contain; border-radius: 12px; background: #222; touch-action: pan-x pan-y pinch-zoom; }
++.guinness-map-full { min-width: 100%; height: auto; display: block; max-width: none; user-select: none; }

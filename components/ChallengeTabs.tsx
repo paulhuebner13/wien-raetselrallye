@@ -26,6 +26,8 @@ export function GuinnessTab({ entries, refresh, locked, scoring }: { entries: Gu
   const [street, setStreet] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [mapOpen, setMapOpen] = useState(false);
+  const [mapZoom, setMapZoom] = useState(1);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -62,6 +64,41 @@ export function GuinnessTab({ entries, refresh, locked, scoring }: { entries: Gu
       <p>Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren. Harfe + Guinness-Schriftzug müssen sichtbar sein.</p>
       <p>Jedes gültige Foto: {scoring.guinnessPerLogo} Punkt{scoring.guinnessPerLogo === 1 ? '' : 'e'}.</p>
     </div>
+    <div className="guinness-map-card">
+      <p>Die Karte zeigt Suchergebnisse für „Irish Pub“ bei Google Maps und dient nur als Orientierung. Das bedeutet nicht, dass bei jedem eingezeichneten Pub auch ein Guinness-Logo zu finden ist.</p>
+      <button
+        type="button"
+        className="guinness-map-preview"
+        onClick={() => { setMapZoom(1); setMapOpen(true); }}
+        aria-label="Karte vergrößern"
+      >
+        <img src="/guinness-map.png" alt="Karte mit Suchergebnissen für Irish Pubs" />
+        <span>Zum Vergrößern antippen</span>
+      </button>
+    </div>
+    {mapOpen && <div
+      className="guinness-map-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Irish-Pub-Karte"
+      onClick={() => setMapOpen(false)}
+    >
+      <div className="guinness-map-toolbar" onClick={(e) => e.stopPropagation()}>
+        <button type="button" onClick={() => setMapZoom((z) => Math.max(1, z - 0.5))}>−</button>
+        <span>{Math.round(mapZoom * 100)}%</span>
+        <button type="button" onClick={() => setMapZoom((z) => Math.min(4, z + 0.5))}>+</button>
+        <button type="button" onClick={() => setMapOpen(false)} aria-label="Schließen">×</button>
+      </div>
+      <div className="guinness-map-viewport" onClick={(e) => e.stopPropagation()}>
+        <img
+          src="/guinness-map.png"
+          alt="Karte mit Suchergebnissen für Irish Pubs"
+          className="guinness-map-full"
+          style={{ width: `${mapZoom * 100}%` }}
+          draggable={false}
+        />
+      </div>
+    </div>}
     {!locked && <form className="upload-form" onSubmit={add}>
       <label className={`file-button ${busy ? 'disabled' : ''}`}>Foto machen<input id="guinness-file" type="file" accept="image/*" capture="environment" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
       {file && <span className="file-name">{file.name}</span>}
