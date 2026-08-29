@@ -18,7 +18,7 @@ type Overview = {
   quiz: Array<{ team_id: string; question_id: string; answer: string }>;
   beers: Array<{ id: string; team_id: string; brand: string; image_url?: string | null }>;
   guinness: Array<{ id: string; team_id: string; street: string; image_url?: string | null }>;
-  architecture: Array<{ id: string; team_id: string; style: string; building_name: string; image_url?: string | null }>;
+  architecture: Array<{ id: string; team_id: string; style: string; building_name: string; image_url?: string | null; created_at?: string }>;
   evaluations: Array<{ team_id: string; item_type: EvalType; item_id: string; is_valid: boolean }>;
   deadlineAt: string | null;
   scoring: ScoringConfig;
@@ -200,6 +200,8 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     setOverview((current) => current ? { ...current, evaluations: [...current.evaluations.filter((e) => !(e.team_id === teamId && e.item_type === itemType && e.item_id === itemId)), { team_id: teamId, item_type: itemType, item_id: itemId, is_valid: isValid }] } : current);
   }
   function evaluationIsValid(teamId: string, itemType: EvalType, itemId: string) { return overview?.evaluations.some((e) => e.team_id === teamId && e.item_type === itemType && e.item_id === itemId && e.is_valid) ?? false; }
+  function isDrinkEntry(entry: { style: string }) { return entry.style.startsWith('drink:'); }
+  function drinkLabel(style: string) { return style.startsWith('drink:irish_car_bomb:') ? 'Irish Car Bomb' : 'Guinness'; }
 
   const scoring = overview?.scoring;
   function pictureRoundScore(teamId: string, q: Question) {
@@ -231,7 +233,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
     const stations = rallyeConfig.stations.reduce((sum, station) => sum + (evaluationIsValid(teamId, 'station', String(station.id)) ? stationTaskPoints(station.id, scoring) : 0), 0);
     const quiz = questionBlocks.flatMap((b) => b.questions).reduce((sum, q) => sum + specialQuestionScore(teamId, q), 0);
     const guinness = overview.guinness.filter((g) => g.team_id === teamId && evaluationIsValid(teamId, 'guinness', g.id)).length * scoring.guinnessPerLogo;
-    const architecture = overview.architecture.filter((a) => a.team_id === teamId && evaluationIsValid(teamId, 'architecture', a.id)).length * scoring.architecturePerStyle;
+    const architecture = overview.architecture.filter((a) => a.team_id === teamId && isDrinkEntry(a) && evaluationIsValid(teamId, 'architecture', a.id)).length * scoring.architecturePerStyle;
     const beer = overview.beers.filter((b) => b.team_id === teamId && evaluationIsValid(teamId, 'beer', b.id)).length * scoring.beerPerUniqueCan;
     return { total: hints + stations + quiz + guinness + architecture + beer, hints, stations, quiz, guinness, architecture, beer };
   }
@@ -299,7 +301,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
       <div className="section-title-row"><div><h2>Punkte</h2><p className="muted">Direkt hier ändern. Gilt nach dem Speichern für Auswertung und Team-App.</p></div><button className="primary" onClick={saveScoring}>{scoringSaveState === 'saving' ? 'Speichert…' : 'Punkte speichern'}</button></div>
       <div className="scoring-editor-grid">
         <label>Guinness / Logo<input type="number" min="0" value={scoringDraft.guinnessPerLogo} onChange={(e) => setScoreField('guinnessPerLogo', Number(e.target.value))} /></label>
-        <label>Architektur / Stil<input type="number" min="0" value={scoringDraft.architecturePerStyle} onChange={(e) => setScoreField('architecturePerStyle', Number(e.target.value))} /></label>
+        <label>Guinness trinken / Getränk<input type="number" min="0" value={scoringDraft.architecturePerStyle} onChange={(e) => setScoreField('architecturePerStyle', Number(e.target.value))} /></label>
         <label>Wegbier / Bier<input type="number" min="0" value={scoringDraft.beerPerUniqueCan} onChange={(e) => setScoreField('beerPerUniqueCan', Number(e.target.value))} /></label>
         <label>Picture Round: ab richtig<input type="number" min="1" max="8" value={scoringDraft.pictureRoundPartialThreshold} onChange={(e) => setScoreField('pictureRoundPartialThreshold', Number(e.target.value))} /></label>
         <label>Picture Round Teilpunkte<input type="number" min="0" value={scoringDraft.pictureRoundPartialPoints} onChange={(e) => setScoreField('pictureRoundPartialPoints', Number(e.target.value))} /></label>
@@ -315,7 +317,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
 
     <section className="admin-panel evaluation-panel">
       <h2>Auswertung</h2>
-      <div className="results-grid two-team-results">{overview.teams.map((team) => { const score = teamScore(team.id); return <article className="result-card" key={team.id}><div><span className="eyebrow">{team.name}</span><strong>{score.total} P.</strong></div><p>Hinweise {score.hints} · Stationen {score.stations} · Quiz {score.quiz} · Guinness {score.guinness} · Architektur {score.architecture} · Wegbier {score.beer}</p></article>; })}</div>
+      <div className="results-grid two-team-results">{overview.teams.map((team) => { const score = teamScore(team.id); return <article className="result-card" key={team.id}><div><span className="eyebrow">{team.name}</span><strong>{score.total} P.</strong></div><p>Hinweise {score.hints} · Stationen {score.stations} · Quiz {score.quiz} · Guinness {score.guinness} · Guinness trinken {score.architecture} · Wegbier {score.beer}</p></article>; })}</div>
 
       <h3>Stationen</h3>
       {rallyeConfig.stations.map((station) => <div className="evaluation-item" key={`station-${station.id}`}><div className="evaluation-item-title"><b>{station.title}</b><span>Vor-Ort-Antwort · {stationTaskPoints(station.id, scoring)} P.</span></div>{teamColumns((team) => { const p = overview.progress.find((x) => x.team_id === team.id && x.station_id === station.id); return <><p className="evaluation-response">{p?.answer || '—'}</p><small>Hinweise: {p?.hints_used ?? 0} · {p?.submitted_at ? Math.max(0, scoring.hintPointsMax - (p.hints_used ?? 0)) : 0} Hinweispunkte</small><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'station', String(station.id))} onChange={(e) => setEvaluation(team.id, 'station', String(station.id), e.target.checked)} /> Richtig</label><button className="secondary mini" onClick={() => resetStation(team.id, station.id)} disabled={!p?.submitted_at}>Antwort zurücksetzen</button></>; })}</div>)}
@@ -334,7 +336,7 @@ export default function AdminApp({ initiallyLoggedIn }: { initiallyLoggedIn: boo
       })}
 
       <h3>Guinness</h3>{teamColumns((team) => <div className="evaluation-entry-list">{overview.guinness.filter((g) => g.team_id === team.id).map((g) => <article className="evaluation-photo-entry" key={g.id}>{g.image_url && <img src={g.image_url} alt="Guinness" />}<b>{g.street}</b><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'guinness', g.id)} onChange={(e) => setEvaluation(team.id, 'guinness', g.id, e.target.checked)} /> Gültig (+{scoring.guinnessPerLogo} P.)</label></article>)}</div>)}
-      <h3>Architektur</h3>{teamColumns((team) => <div className="evaluation-entry-list">{overview.architecture.filter((a) => a.team_id === team.id).map((a) => <article className="evaluation-photo-entry" key={a.id}>{a.image_url && <img src={a.image_url} alt={a.style} />}<b>{a.style}</b><span>{a.building_name}</span><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'architecture', a.id)} onChange={(e) => setEvaluation(team.id, 'architecture', a.id, e.target.checked)} /> Gültig (+{scoring.architecturePerStyle} P.)</label></article>)}</div>)}
+      <h3>Guinness trinken</h3>{teamColumns((team) => <div className="evaluation-entry-list">{overview.architecture.filter((a) => a.team_id === team.id && isDrinkEntry(a)).map((a) => <article className="evaluation-photo-entry" key={a.id}>{a.image_url && <img src={a.image_url} alt={drinkLabel(a.style)} />}<b>{drinkLabel(a.style)}</b><span>{a.building_name}</span>{a.created_at && <small>Hochgeladen {new Date(a.created_at).toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}</small>}<label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'architecture', a.id)} onChange={(e) => setEvaluation(team.id, 'architecture', a.id, e.target.checked)} /> Gültig (+{scoring.architecturePerStyle} P.)</label></article>)}</div>)}
       <h3>Wegbier</h3>{teamColumns((team) => <div className="evaluation-entry-list">{overview.beers.filter((b) => b.team_id === team.id).map((b) => <article className="evaluation-photo-entry" key={b.id}>{b.image_url && <img src={b.image_url} alt={b.brand} />}<b>{b.brand}</b><label className="evaluation-check"><input type="checkbox" checked={evaluationIsValid(team.id, 'beer', b.id)} onChange={(e) => setEvaluation(team.id, 'beer', b.id, e.target.checked)} /> Gültig (+{scoring.beerPerUniqueCan} P.)</label></article>)}</div>)}
     </section>
   </main>;

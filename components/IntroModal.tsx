@@ -14,8 +14,8 @@ export default function IntroModal({ config, onClose }: { config: RallyeConfig; 
         <ul>{config.intro.phoneRules.map((line) => <li key={line}>{line}</li>)}</ul>
         <h3>Zusätzliche Aufgaben</h3>
         <ul>
-          <li><b>Guinness:</b> Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren und Fotos in der App hochladen. Harfe + Guinness-Schriftzug müssen sichtbar sein.</li>
-          <li><b>Architektur:</b> 5 Gebäude der vorgegebenen Stile fotografieren und Fotos in der App hochladen.</li>
+          <li><b>Guinness-Logos:</b> Außen-Schilder mit Guinness-Logos verschiedener Pubs fotografieren und Fotos in der App hochladen. Harfe + Guinness-Schriftzug müssen sichtbar sein.</li>
+          <li><b>Guinness trinken:</b> Guinness oder Irish Car Bomb fotografieren und eintragen, wer es getrunken hat.</li>
           <li><b>Wegbier:</b> Verschiedene Dosenbiere als Wegbiere kaufen, trinken, in der App fotografieren und eintragen. Radler, Cider oder alkoholfreies Bier zählen nicht!</li>
         </ul>
         <button className="primary full" onClick={onClose}>Los geht&apos;s</button>

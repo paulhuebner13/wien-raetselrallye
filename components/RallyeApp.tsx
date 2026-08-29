@@ -19,9 +19,9 @@ type TeamState = {
   blockStates: Record<string, BlockState>;
   quizTimer: { enabled: boolean; durations: Record<string, number> };
   quiz: Record<string, string>;
-  beers: Array<{ id: string; brand: string; image_url: string | null }>;
-  guinness: Array<{ id: string; street: string; image_url: string | null }>;
-  architecture: Array<{ id: string; style: string; building_name: string; image_url: string | null }>;
+  beers: Array<{ id: string; brand: string; image_url: string | null; created_at?: string }>;
+  guinness: Array<{ id: string; street: string; image_url: string | null; created_at?: string }>;
+  architecture: Array<{ id: string; style: string; building_name: string; image_url: string | null; created_at?: string }>;
   deadlineAt: string | null;
   locked: boolean;
   finalStationTitle: string;
@@ -140,7 +140,7 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
 
   return <main className="app-shell">
     <header className="app-header">
-      <div><span className="eyebrow">{teamName}</span><h1>{tab === 'rallye' ? 'Rallye' : tab === 'guinness' ? 'Guinness' : tab === 'architecture' ? 'Architektur' : 'Wegbier'}</h1></div>
+      <div><span className="eyebrow">{teamName}</span><h1>{tab === 'rallye' ? 'Rallye' : tab === 'guinness' ? 'Guinness' : tab === 'architecture' ? 'Guinness trinken' : 'Wegbier'}</h1></div>
       <div className="header-actions"><button className="icon-button" onClick={() => setShowIntro(true)}>i</button><button className="text-button" onClick={logout}>Logout</button></div>
     </header>
     <div className={`deadline-bar ${localLocked ? 'expired' : ''}`}>
@@ -160,14 +160,14 @@ export default function RallyeApp({ config, blocks, teamName }: { config: Rallye
         </div>;
       })}</section>}
       {tab === 'guinness' && <GuinnessTab entries={state.guinness} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
-      {tab === 'architecture' && <ArchitectureTab entries={state.architecture} styles={config.architectureStyles} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
+      {tab === 'architecture' && <ArchitectureTab entries={state.architecture} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
       {tab === 'beer' && <BeerTab beers={state.beers} refresh={refresh} locked={localLocked} scoring={state.scoring} />}
     </div>
 
     <nav className="bottom-nav">
       <button className={tab === 'rallye' ? 'active' : ''} onClick={() => setTab('rallye')}><span>⌁</span>Rallye</button>
       <button className={tab === 'guinness' ? 'active' : ''} onClick={() => setTab('guinness')}><span>G</span>Guinness</button>
-      <button className={tab === 'architecture' ? 'active' : ''} onClick={() => setTab('architecture')}><span>⌂</span>Architektur</button>
+      <button className={tab === 'architecture' ? 'active' : ''} onClick={() => setTab('architecture')}><span>⌂</span>Trinken</button>
       <button className={tab === 'beer' ? 'active' : ''} onClick={() => setTab('beer')}><span>▥</span>Wegbier</button>
     </nav>
 

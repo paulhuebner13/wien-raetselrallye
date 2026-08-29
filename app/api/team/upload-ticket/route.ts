@@ -1,5 +1,4 @@
 import { randomUUID } from 'crypto';
-import { rallyeConfig } from '@/lib/config';
 import { deadlinePassed } from '@/lib/deadline';
 import { bad, normalize, normalizeBeer, ok } from '@/lib/http';
 import { requireTeam } from '@/lib/session';
@@ -24,12 +23,9 @@ export async function POST(request: Request) {
     if (duplicate) return bad('Diese Straße wurde schon verwendet.');
     folder = 'guinness';
   } else if (kind === 'architecture') {
-    const style = String(body.style ?? '').trim();
-    const buildingName = String(body.buildingName ?? '').trim();
-    const styleNames = rallyeConfig.architectureStyles.map((s) => s.name);
-    if (!buildingName || !styleNames.includes(style)) return bad('Stil oder Gebäudename fehlt.');
-    const { data: existing } = await db.from('architecture_entries').select('id').eq('team_id', session.teamId).eq('style', style).maybeSingle();
-    if (existing) return bad('Für diesen Stil gibt es schon ein Foto.');
+    const drinkType = String(body.drinkType ?? '').trim();
+    const drinker = String(body.drinker ?? '').trim();
+    if (!drinker || !['guinness', 'irish_car_bomb'].includes(drinkType)) return bad('Getränk oder Name fehlt.');
     folder = 'architecture';
   } else if (kind === 'beer') {
     const brand = String(body.brand ?? '').trim();
