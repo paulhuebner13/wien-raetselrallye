@@ -548,3 +548,22 @@ html, body { background: var(--bg); }
 .guinness-map-full { min-width: 100%; height: auto; display: block; max-width: none; user-select: none; }
 
 .upload-time { display: block; margin: 6px 0 4px; color: var(--muted); font-size: 11px; font-weight: 400; }
+
+.supermarket-card > b {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.supermarket-list {
+  margin-bottom: 12px;
+}
+
+.supermarket-list p {
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+.supermarket-list small {
+  font-size: 11px;
+  color: var(--muted);
+}
