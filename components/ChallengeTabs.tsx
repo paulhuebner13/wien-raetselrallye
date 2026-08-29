@@ -245,10 +245,10 @@ export function BeerTab({ beers, refresh, locked, scoring }: { beers: Beer[]; re
       <p>Sorten zählen getrennt: z. B. Stiegl Goldbräu und Stiegl Hell. 0,33 l und 0,5 l derselben Sorte zählen nicht doppelt.</p>
     </div>
     <div className="guinness-map-card supermarket-card">
-      <b>Spät offene Einkaufsmöglichkeiten</b>
+      <b>Supermärkte</b>
       <div className="supermarket-list">
         <p><b>BILLA CORSO Herrnhuterhaus</b><br />Neuer Markt 17 · bis 20:00</p>
-        <p><b>SPAR Babenbergerstraße</b><br />Babenbergerstraße 9 · bis 21:00 <small>(nach 18:00 nur Bistro)</small></p>
+        <p><b>SPAR Babenbergerstraße</b><br />Babenbergerstraße 9 · bis 21:00</p>
         <p><b>INTERSPAR-pronto Wien Mitte</b><br />Landstraßer Hauptstraße 1b · bis 23:00</p>
         <p><b>OKAY Markt Schottentor</b><br />U-Bahn-Station Schottentor 1 · bis 21:45</p>
       </div>
